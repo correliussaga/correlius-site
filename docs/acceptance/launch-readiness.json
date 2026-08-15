@@ -1,0 +1,85 @@
+{
+  "format": "correlius-launch-readiness-v1",
+  "asOf": "2026-08-15",
+  "productionLaunchAuthorized": false,
+  "criteria": [
+    {
+      "id": "success-01",
+      "status": "blocked",
+      "evidence": ["Automated public-shell structure and responsive CSS checks pass locally."],
+      "blocker": "Approved public content, representative imagery, a released film, and timed first-time mobile usability evidence are absent."
+    },
+    {
+      "id": "success-02",
+      "status": "blocked",
+      "evidence": ["Released-episode schema rejects missing Stream, caption, metadata, and approval fields."],
+      "blocker": "Two approved episode records, processed Stream assets, captions, allowed-origin configuration, and anonymous browser/device playback evidence are absent."
+    },
+    {
+      "id": "success-03",
+      "status": "blocked",
+      "evidence": ["The request boundary and provider-failure test harness pass locally."],
+      "blocker": "The form remains disabled pending approved privacy copy, real Turnstile/KV/rate/email bindings, delivery evidence, and production abuse testing."
+    },
+    {
+      "id": "success-04",
+      "status": "blocked",
+      "evidence": ["The exact-email, one-tier, eight-hour Access administration runbook is recorded."],
+      "blocker": "The private repository, partner Pages project, Access application, approved/unapproved OTP evidence, and direct-resource denial matrix do not exist."
+    },
+    {
+      "id": "success-05",
+      "status": "blocked",
+      "evidence": [],
+      "blocker": "Reviewed de-identified evidence, methodology, limitations, quotations, accessible report, private repository, and Access proof are absent."
+    },
+    {
+      "id": "success-06",
+      "status": "blocked",
+      "evidence": [],
+      "blocker": "Rights-cleared partner media resources, accessible files, manifest/package, private deployment, and protected-download evidence are absent."
+    },
+    {
+      "id": "success-07",
+      "status": "blocked",
+      "evidence": [],
+      "blocker": "Approved donor facts, completed/planned distinctions, Fractured Atlas destination, contact path, private deployment, and reviewer evidence are absent."
+    },
+    {
+      "id": "success-08",
+      "status": "blocked",
+      "evidence": ["Episode release and partner approval/revocation runbooks are recorded."],
+      "blocker": "Brian has not yet performed the required live N+1, deployment, rollback, approval, and active-revocation rehearsals."
+    },
+    {
+      "id": "success-09",
+      "status": "blocked",
+      "evidence": ["Static semantic checks pass for every generated route with zero Astro diagnostics."],
+      "blocker": "Manual keyboard, assistive-technology, captions, 320-pixel reflow, 200-percent zoom, forced-colors, and browser/device evidence are incomplete."
+    },
+    {
+      "id": "success-10",
+      "status": "blocked",
+      "evidence": ["Build and partner-boundary scanners pass locally; deterministic output manifests are generated."],
+      "blocker": "Final Git history, CI artifact, deployment URL, provider log, and private-repository audits cannot occur before the production and partner systems exist."
+    },
+    {
+      "id": "success-11",
+      "status": "blocked",
+      "evidence": ["Unique canonical, Open Graph, and X text metadata are structurally verified."],
+      "blocker": "Approved social images, released episode metadata, public discovery, sitemap, and real Slack/Discord/X/Facebook preview evidence are absent."
+    },
+    {
+      "id": "success-12",
+      "status": "blocked",
+      "evidence": [],
+      "blocker": "Brian has not confirmed and tabletop-tested the private legal/IP response plan stored outside public Git."
+    },
+    {
+      "id": "success-13",
+      "status": "blocked",
+      "evidence": ["Pinned CI and preview response-header configuration are present in the repository."],
+      "blocker": "Production HTTPS/HSTS/CSP, SSL, DNSSEC, email authentication, 2FA, branch protection, scoped integration, alert delivery, and dated configuration evidence are absent."
+    }
+  ]
+}

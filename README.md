@@ -4,7 +4,7 @@ This repository contains the public Correlius.org site. The approved architectur
 
 ## Current implementation stage
 
-Stage 6 implements the fail-closed public partner-request boundary and records the external partner platform gates. The request form remains disabled until reviewed Cloudflare bindings, mailbox/DNS configuration, final privacy wording, and production evidence exist. Protected portal code and material remain excluded pending a separate private repository and proven Cloudflare Access boundary. The project record remains draft, the episode collection contains no public-eligible film record, all pages remain `noindex`, and nothing is approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
+Stage 7 completes the repository-owned acceptance and operations package. CI runs the full suite, builds produce deterministic artifact manifests, a deliberately gated hourly production smoke workflow is ready, and the machine-readable launch ledger records every unresolved success criterion. Production authorization remains false: the request form and discovery stay disabled, protected portal code and material remain excluded, the project record remains draft, and the episode collection contains no public-eligible film record. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
 
 ## Local development
 
@@ -16,6 +16,8 @@ npm test
 ```
 
 Run `npm run dev` only for local development. Generated output is written to `dist/` and is never committed.
+
+`npm run audit:launch` validates the launch ledger without claiming readiness. `npm run verify:launch` is the intentional production gate and must fail until all 13 criteria have dated evidence and Brian records launch authorization.
 
 ## Public/private boundary
 

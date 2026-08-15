@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   access,
   mkdtemp,
@@ -56,9 +57,25 @@ async function filesUnder(directory) {
   return files;
 }
 
+async function fileRecords(directory, manifestPath) {
+  const records = [];
+  for (const path of await filesUnder(directory)) {
+    if (path === manifestPath) continue;
+    const content = await readFile(path);
+    records.push({
+      path: relative(directory, path).split("\\").join("/"),
+      bytes: content.byteLength,
+      sha256: createHash("sha256").update(content).digest("hex"),
+    });
+  }
+  records.sort((left, right) => left.path.localeCompare(right.path));
+  return records;
+}
+
 export async function verifyBuild(directory) {
   await access(join(directory, "index.html"));
   await access(join(directory, "robots.txt"));
+  await access(join(directory, "build-manifest.json"));
 
   const violations = [];
   for (const path of await filesUnder(directory)) {
@@ -85,6 +102,17 @@ export async function verifyBuild(directory) {
   if (violations.length > 0) {
     throw new Error(`Build boundary verification failed:\n${violations.join("\n")}`);
   }
+
+  const manifestPath = join(directory, "build-manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  if (manifest.format !== "correlius-public-build-manifest-v1" || !Array.isArray(manifest.files)) {
+    throw new Error("Build boundary verification failed: invalid build manifest");
+  }
+
+  const actualFiles = await fileRecords(directory, manifestPath);
+  if (JSON.stringify(manifest.files) !== JSON.stringify(actualFiles)) {
+    throw new Error("Build boundary verification failed: build manifest does not match output");
+  }
 }
 
 async function selfTest() {
@@ -94,16 +122,42 @@ async function selfTest() {
     await mkdir(join(fixtureRoot, "assets"));
     await writeFile(join(fixtureRoot, "index.html"), "<!doctype html><title>Fixture</title>");
     await writeFile(join(fixtureRoot, "robots.txt"), "User-agent: *\nDisallow: /\n");
+    await writeFile(
+      join(fixtureRoot, "build-manifest.json"),
+      '{"format":"correlius-public-build-manifest-v1","files":[]}',
+    );
     await writeFile(join(fixtureRoot, "assets", "fixture.js"), "CF_API_TOKEN=fixture");
 
+    let secretRejected = false;
     try {
       await verifyBuild(fixtureRoot);
     } catch {
-      console.log("Build boundary scanner rejected the secret fixture as expected.");
-      return;
+      secretRejected = true;
     }
+    if (!secretRejected) throw new Error("Build boundary scanner accepted a secret fixture.");
+    console.log("Build boundary scanner rejected the secret fixture as expected.");
 
-    throw new Error("Build boundary scanner accepted a secret fixture.");
+    await writeFile(join(fixtureRoot, "assets", "fixture.js"), "const fixtureIsSafe = true;");
+    const fixtureManifestPath = join(fixtureRoot, "build-manifest.json");
+    const fixtureFiles = await fileRecords(fixtureRoot, fixtureManifestPath);
+    await writeFile(
+      fixtureManifestPath,
+      JSON.stringify({ format: "correlius-public-build-manifest-v1", files: fixtureFiles }),
+    );
+    await verifyBuild(fixtureRoot);
+
+    await writeFile(
+      fixtureManifestPath,
+      '{"format":"correlius-public-build-manifest-v1","files":[]}',
+    );
+    let tamperRejected = false;
+    try {
+      await verifyBuild(fixtureRoot);
+    } catch {
+      tamperRejected = true;
+    }
+    if (!tamperRejected) throw new Error("Build boundary scanner accepted a stale manifest.");
+    console.log("Build boundary scanner rejected the stale manifest as expected.");
   } finally {
     await rm(fixtureRoot, { recursive: true });
   }

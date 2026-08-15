@@ -10,3 +10,4 @@ Describe the user-visible or operational outcome.
 - [ ] Accessibility, privacy, rights/credits, security headers, and external links affected by this change were reviewed.
 - [ ] The change stays within the approved MVP scope and cost categories.
 - [ ] Rollback or removal behavior is understood for this change.
+- [ ] The launch ledger remains accurate; this change does not imply production authorization.
