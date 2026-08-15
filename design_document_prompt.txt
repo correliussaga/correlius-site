@@ -1,0 +1,780 @@
+You are the principal application architect for Correlius.org.
+
+Your task is to transform the attached/available "Correlius MVP" requirements document into a complete, implementation-ready technical design for the Correlius.org MVP.
+
+DO NOT begin implementation.
+
+DO NOT create application source code.
+
+DO NOT modify the MVP requirements.
+
+Your job in this phase is architecture and detailed design only.
+
+============================================================
+PRIMARY SOURCE OF TRUTH
+============================================================
+
+Locate and read the complete Correlius MVP requirements document available in this workspace/context.
+
+Treat that document as the authoritative product specification.
+
+The requirements include:
+- User stories US-01 through US-28
+- Acceptance criteria
+- Public and authenticated partner navigation
+- Definition of MVP Success
+- Explicitly Outside the MVP
+
+Every architectural decision must be traceable to those requirements.
+
+Do not silently invent requirements.
+
+If a technical decision must be made where the MVP is intentionally silent, make the smallest reasonable decision that:
+1. satisfies the existing requirements,
+2. minimizes cost,
+3. minimizes operational complexity,
+4. minimizes security risk,
+5. preserves maintainability for a single technical owner,
+6. avoids unnecessary vendor dependence, and
+7. does not expand MVP scope.
+
+Clearly label such decisions as "Architectural Decisions" rather than implying they came from the requirements.
+
+If information is genuinely insufficient to make a responsible implementation decision, record it under "Open Questions" rather than inventing an answer.
+
+============================================================
+PROJECT CONTEXT
+============================================================
+
+Correlius is a nonprofit, noncommercial Star Wars fan-film project.
+
+The website has two major surfaces:
+
+1. PUBLIC SITE
+   correlius.org
+
+   The public site centers the films themselves and allows ordinary
+   viewers to understand the project and watch released episodes
+   without authentication.
+
+2. PARTNER EVIDENCE ROOM
+   partners.correlius.org
+
+   This is a controlled professional area intended for approved:
+   - podcasters
+   - forum/community moderators
+   - convention organizers
+   - journalists
+   - clinicians
+   - collaborators
+   - prospective donors
+
+   It contains audience evidence, editorial/feature materials,
+   donor information, media resources, and collaboration materials.
+
+The architecture should remain deliberately lightweight.
+
+This is an MVP operated primarily by one technically capable creator.
+The website must support the filmmaking effort rather than become a
+second full-time job.
+
+============================================================
+KNOWN ARCHITECTURAL CONSTRAINTS FROM THE MVP
+============================================================
+
+Preserve these unless the source requirements explicitly say otherwise:
+
+- GitHub for source control.
+- Cloudflare Pages / Cloudflare edge delivery for static web hosting.
+- Cloudflare Stream for video.
+- Cloudflare Access for partner authentication.
+- Email one-time PIN authentication for approved partners.
+- Fractured Atlas handles donations.
+- No custom donation processing.
+- No custom CMS.
+- No application database for MVP.
+- No ordinary viewer accounts.
+- No public comments/forums.
+- No paid memberships.
+- No native mobile application.
+- No live streaming.
+- No raw survey datasets deployed to the website.
+- No sensitive legal/insurance/participant material in the public repository.
+- No unnecessary advertising trackers.
+- Cloudflare-native analytics, security, CDN, and alerting should be preferred where they satisfy the requirement.
+- GitHub-based deployment should remain simple and reversible.
+- Public content and partner content must remain architecturally separated.
+- Partner content must be deny-by-default.
+- The design must support at least four Correlius Journal episodes without redesign.
+
+Do not introduce AWS, Azure, Firebase, Supabase, Auth0, WordPress,
+Contentful, a relational database, Kubernetes, Docker infrastructure,
+microservices, or another major platform unless an explicit MVP
+requirement makes it unavoidable.
+
+If Cloudflare/GitHub functionality is sufficient, prefer it.
+
+============================================================
+ARCHITECTURAL PRINCIPLES
+============================================================
+
+Optimize the design in this order:
+
+1. Requirements correctness
+2. Security and privacy
+3. Accessibility
+4. Reliability
+5. Low/no operating cost
+6. Operational simplicity
+7. Maintainability by one owner
+8. Performance
+9. Extensibility
+10. Architectural elegance
+
+Avoid overengineering.
+
+Apply YAGNI aggressively.
+
+Prefer static content and configuration over dynamic services.
+
+Prefer configuration over custom code where Cloudflare or GitHub
+already provides the required capability.
+
+Do not design for hypothetical millions of users beyond ensuring the
+static/edge architecture can naturally tolerate traffic growth.
+
+Do not turn future possibilities into MVP components.
+
+============================================================
+IMPORTANT SECURITY MODEL
+============================================================
+
+Treat the partner evidence room as genuinely private content.
+
+robots.txt and noindex are NOT security controls.
+
+The design must ensure that unauthenticated users cannot retrieve
+partner content or protected files even when they know the direct URL.
+
+Analyze:
+
+- Cloudflare Access enforcement
+- approved-email allowlisting
+- one-time PIN authentication
+- session expiration
+- revocation
+- authentication logging
+- rate limiting
+- WAF/bot protections
+- protected downloads
+- direct URL access
+- indexing prevention
+- secrets management
+- GitHub branch protection
+- GitHub and Cloudflare 2FA
+- least-privilege Cloudflare API tokens
+- CSP
+- HSTS
+- X-Content-Type-Options
+- frame restrictions
+- Referrer-Policy
+- DNSSEC
+- registrar protections
+- SPF/DKIM/DMARC where applicable
+- security.txt
+- dependency vulnerability management
+- deployment supply-chain security
+
+Explicitly identify trust boundaries.
+
+Never place an allowlist, credential, API key, secret, participant
+identifier, raw survey response, or sensitive donor/legal material in
+client-side JavaScript or the public Git repository.
+
+============================================================
+VIDEO ARCHITECTURE
+============================================================
+
+Cloudflare Stream is the authoritative streaming platform for released
+Correlius films.
+
+Design for:
+
+- public embedded playback
+- domain-restricted embedding
+- captions
+- episode metadata
+- thumbnails
+- multiple episodes
+- responsive playback
+- accessibility
+- browser/device compatibility
+- graceful player failure
+- video analytics where available
+- masters retained outside the website repository
+- adding future episodes without changing navigation architecture
+
+Clearly distinguish:
+
+SOURCE MASTER
+STREAMING ASSET
+CAPTION FILE
+EPISODE METADATA
+PUBLIC EPISODE PAGE
+
+Do not store large master video files in GitHub.
+
+============================================================
+PARTNER ACCESS REQUEST
+============================================================
+
+US-08 requires a public partner-access request process.
+
+Design the smallest secure mechanism capable of:
+
+- collecting the required fields
+- privacy notice
+- spam protection
+- rate limiting
+- duplicate-submission detection
+- notifying Brian by email
+- confirming submission to the applicant
+- manual approval
+- NOT automatically granting Cloudflare Access
+
+Do not introduce a database merely because forms exist.
+
+If multiple reasonable Cloudflare-native approaches exist, compare
+them briefly and recommend one.
+
+Explicitly identify any requirement that cannot be satisfied cleanly
+without some state/storage and propose the smallest acceptable state
+mechanism.
+
+============================================================
+CONTENT MODEL
+============================================================
+
+Design reusable static content structures for at least:
+
+- episodes
+- project information
+- creator information
+- calls to action
+- audience findings
+- downloadable partner resources
+- donor funding categories
+- collaboration formats
+
+Content updates should not require changing authentication logic.
+
+The episode content model must support adding episodes by supplying
+metadata and a Cloudflare Stream identifier rather than redesigning
+pages.
+
+============================================================
+SEO / DISCOVERY
+============================================================
+
+Design baseline technical discovery for the PUBLIC site only:
+
+- title
+- meta description
+- canonical URL where appropriate
+- Open Graph
+- Twitter/X card metadata
+- representative images
+- sitemap.xml
+- robots.txt
+- per-episode metadata
+
+The partner site must not appear in public sitemap/navigation/search
+indexing.
+
+Again: indexing controls are supplemental privacy measures, not
+authentication.
+
+============================================================
+ACCESSIBILITY
+============================================================
+
+Treat WCAG AA expectations in the MVP as architecture-level
+requirements.
+
+Address:
+
+- semantic HTML
+- keyboard navigation
+- focus indicators
+- contrast
+- alternative text
+- heading hierarchy
+- 200% zoom
+- responsive layouts
+- captions
+- no required autoplay
+- no required motion
+- accessible forms
+- readable error states
+
+============================================================
+ANALYTICS
+============================================================
+
+Design privacy-conscious measurement sufficient to distinguish:
+
+- public film-page visits
+- film starts
+- approximate viewing minutes where technically available
+- support-link selections
+- partner-access requests
+- authenticated partner visits
+- collaboration-contact actions
+
+Do not invent measurement capabilities Cloudflare does not provide.
+
+If a metric requires custom instrumentation, state that explicitly.
+
+Keep audience-survey evidence conceptually and technically separate
+from website analytics.
+
+============================================================
+LEGAL / IP RESPONSE
+============================================================
+
+US-21 requires documentation/process, not application functionality.
+
+The architecture documents should identify where this private
+operational document belongs and explicitly ensure it is NOT deployed
+to the public repository/site.
+
+Do not provide legal advice.
+
+Do not reproduce or infer privileged legal analysis.
+
+============================================================
+DELIVERABLES
+============================================================
+
+Create a /docs/design directory if it does not already exist.
+
+Generate exactly these files:
+
+docs/design/01-system-context.md
+docs/design/02-architecture.md
+docs/design/03-public-site-design.md
+docs/design/04-partners-site-design.md
+docs/design/05-content-and-video-architecture.md
+docs/design/06-security-and-access-control.md
+docs/design/07-deployment-design.md
+docs/design/08-requirements-traceability.md
+docs/design/09-implementation-plan.md
+
+============================================================
+01-system-context.md
+============================================================
+
+Document:
+
+- system purpose
+- business/project context
+- primary users/personas
+- public vs partner audiences
+- external systems
+- system boundaries
+- trust boundaries
+- information classifications
+- major user journeys
+- architecture constraints
+- assumptions
+- explicit non-goals
+
+Include a Mermaid system-context diagram.
+
+The diagram should show at minimum:
+
+Viewer
+Approved Partner
+Brian / Administrator
+GitHub
+Cloudflare Pages
+Cloudflare Stream
+Cloudflare Access
+Fractured Atlas
+Email mechanism
+Correlius.org
+partners.correlius.org
+
+============================================================
+02-architecture.md
+============================================================
+
+Produce the overall technical architecture.
+
+Include:
+
+- architecture style
+- logical components
+- public-site architecture
+- partner-site architecture
+- Cloudflare services used
+- GitHub responsibilities
+- authentication boundary
+- content architecture
+- form-processing architecture
+- analytics architecture
+- external integrations
+- major data flows
+- failure modes
+- architectural decisions
+- alternatives considered
+- open questions
+
+Include Mermaid diagrams for:
+
+1. logical architecture
+2. public video request/playback flow
+3. partner authentication flow
+4. partner-access request flow
+
+Every component must have an MVP justification.
+
+============================================================
+03-public-site-design.md
+============================================================
+
+Design:
+
+- information architecture
+- routes/pages
+- navigation
+- homepage
+- Watch page
+- episode detail page
+- About
+- Support
+- For Partners
+- footer/disclaimer
+- responsive behavior
+- accessibility behavior
+- SEO/social metadata
+- error/fallback states
+
+Provide a route table.
+
+For every page describe:
+
+PURPOSE
+PRIMARY USER
+CONTENT
+COMPONENTS
+CALLS TO ACTION
+DATA/CONTENT SOURCE
+ACCESSIBILITY
+SEO METADATA
+ERROR STATES
+RELEVANT USER STORIES
+
+Do not write marketing copy unless required to demonstrate structure.
+
+============================================================
+04-partners-site-design.md
+============================================================
+
+Design the protected evidence room.
+
+Include:
+
+- authentication entry experience
+- Partner Overview
+- Audience Evidence
+- Feature Correlius
+- Donor Brief
+- Media Kit
+- Contact Brian
+- protected downloadable resources
+- noindex behavior
+- session behavior
+- access-denied behavior
+- logout/session expiration
+- resource organization
+
+Clearly distinguish:
+
+PUBLIC PARTNER-ACCESS REQUEST
+from
+AUTHENTICATED PARTNER PORTAL
+
+Do not accidentally make partner resources publicly retrievable.
+
+============================================================
+05-content-and-video-architecture.md
+============================================================
+
+Define:
+
+- episode content schema
+- static content structures
+- recommended file/directory organization
+- Cloudflare Stream integration
+- video identifier management
+- captions
+- thumbnails/posters
+- metadata
+- release state
+- "Coming Soon" handling
+- adding an episode
+- removing/unpublishing an episode
+- player failure behavior
+- source-master retention
+- downloadable partner assets
+- audience evidence content structure
+
+Provide sample schemas/examples using fictitious or placeholder values.
+
+Do not expose real secrets.
+
+Explain the administrator workflow for publishing Episode N+1.
+
+============================================================
+06-security-and-access-control.md
+============================================================
+
+Perform an MVP-scale security design and lightweight threat model.
+
+Include:
+
+- assets
+- actors
+- trust boundaries
+- attack surfaces
+- threat scenarios
+- mitigations
+- residual risks
+
+Cover every requirement from US-18 and US-23 through US-28.
+
+Include:
+
+- Cloudflare Access
+- allowlist model
+- OTP/PIN flow
+- session lifetime
+- session revocation
+- rate limiting
+- WAF
+- bot protection
+- CSP
+- HTTPS/HSTS
+- browser headers
+- DNSSEC
+- registrar protection
+- email authentication
+- GitHub security
+- branch protection
+- dependency security
+- secrets management
+- security.txt
+- logging
+- protected downloads
+- privacy
+- raw research data separation
+
+Provide a security launch checklist.
+
+Do not claim protections that the proposed architecture cannot
+actually enforce.
+
+============================================================
+07-deployment-design.md
+============================================================
+
+Define:
+
+- environments
+- Git strategy
+- production branch
+- branch protection
+- build process
+- deployment pipeline
+- Cloudflare Pages deployment
+- secrets handling
+- configuration
+- DNS
+- custom domains
+- Stream configuration
+- Access configuration
+- rollback
+- failed deployment behavior
+- monitoring/alerts
+- routine content deployment
+- disaster/recovery considerations appropriate to MVP scale
+
+Include a Mermaid deployment diagram.
+
+Provide:
+
+DEPLOYMENT RUNBOOK
+ROLLBACK RUNBOOK
+NEW EPISODE RELEASE RUNBOOK
+PARTNER APPROVAL RUNBOOK
+PARTNER REVOCATION RUNBOOK
+
+Keep these understandable by a technically experienced owner who does
+not want to become a full-time site administrator.
+
+============================================================
+08-requirements-traceability.md
+============================================================
+
+This document is critical.
+
+Create a traceability matrix covering EVERY user story:
+
+US-01 through US-28.
+
+Columns:
+
+Requirement
+Short Description
+Primary Design Artifact
+Design Section
+Technical Component(s)
+Implementation Work Package
+Verification Method
+Status
+
+Initial status should be DESIGN COMPLETE or OPEN QUESTION as
+appropriate.
+
+Then separately trace all 13 Definition of MVP Success criteria.
+
+Finally trace every "Explicitly Outside the MVP" item and confirm that
+the architecture does NOT accidentally implement it.
+
+No user story may disappear.
+
+No acceptance criterion should be knowingly contradicted.
+
+If a requirement is only partially addressed, say so explicitly.
+
+============================================================
+09-implementation-plan.md
+============================================================
+
+Convert the approved architecture into an ordered implementation plan.
+
+Do NOT implement it.
+
+Organize work into small work packages that can later be assigned to
+Codex one at a time.
+
+For each work package provide:
+
+ID
+TITLE
+OBJECTIVE
+REQUIREMENTS SATISFIED
+DEPENDENCIES
+FILES/AREAS EXPECTED TO CHANGE
+IMPLEMENTATION TASKS
+SECURITY CONSIDERATIONS
+TEST/VERIFICATION
+DEFINITION OF DONE
+
+Prioritize a vertical slice that gets a safe public Correlius.org
+online quickly without compromising the eventual architecture.
+
+Then incrementally add:
+
+- public content
+- film playback
+- accessibility
+- SEO/social metadata
+- support routing
+- partner-access request
+- partner authentication
+- partner evidence room
+- media kit
+- analytics
+- security hardening
+- deployment/operational documentation
+- final MVP verification
+
+Identify which tasks can be parallelized and which must remain
+sequential.
+
+Include a final MVP launch checklist mapped back to the Definition of
+MVP Success.
+
+============================================================
+REQUIREMENTS VALIDATION
+============================================================
+
+Before finalizing the documents:
+
+1. Re-read the source MVP.
+2. Confirm that US-01 through US-28 all appear in the traceability
+   matrix.
+3. Confirm all 13 MVP Success criteria are addressed.
+4. Confirm every Explicitly Outside the MVP item remains outside.
+5. Confirm the architecture does not require a database or custom CMS.
+6. Confirm public films require no authentication.
+7. Confirm partner materials cannot be retrieved without authentication.
+8. Confirm donations are processed externally by Fractured Atlas.
+9. Confirm no raw survey data or sensitive legal material is deployed.
+10. Confirm the design supports at least four episodes.
+11. Confirm routine publishing does not require authentication-code
+    changes.
+12. Confirm security requirements have concrete implementation and
+    verification steps.
+13. Confirm accessibility requirements have concrete implementation and
+    verification steps.
+14. Confirm the design remains reasonable for one technical owner.
+15. Identify any contradictions or technically infeasible acceptance
+    criteria rather than silently working around them.
+
+============================================================
+QUALITY STANDARD
+============================================================
+
+These documents will become the authoritative engineering design for
+the Correlius.org MVP and will later be given to an AI coding agent for
+implementation.
+
+Therefore:
+
+- Be specific.
+- Be internally consistent.
+- Prefer concrete decisions over vague recommendations.
+- Explain WHY important architectural decisions were made.
+- Reference user-story IDs throughout.
+- Use tables where they improve precision.
+- Use Mermaid diagrams where they improve comprehension.
+- Separate requirements from architectural decisions.
+- Separate confirmed facts from assumptions.
+- Do not hide uncertainty.
+- Do not overengineer.
+- Do not implement code.
+- Do not expand scope.
+- Do not optimize for hypothetical future requirements at the expense
+  of this MVP.
+- Make every document usable independently while avoiding unnecessary
+  duplication.
+
+============================================================
+FINAL RESPONSE
+============================================================
+
+After creating all nine documents, do not begin implementation.
+
+Return only:
+
+1. The list of files created.
+2. A concise architecture summary.
+3. Architectural decisions that require Brian's approval.
+4. Open questions or requirement conflicts.
+5. Any requirement you believe cannot be implemented exactly as written.
+6. Your recommendation on whether the design is ready for implementation.
+
+Then STOP and wait for approval.
