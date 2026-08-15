@@ -1,0 +1,131 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import Notice from "../../components/Notice.astro";
+import StreamPlayer from "../../components/StreamPlayer.astro";
+import { formatRuntime } from "../../content/episode-schema.mjs";
+import { siteConfiguration } from "../../config/site";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getPublicEpisodes } from "../../lib/content";
+
+export async function getStaticPaths() {
+  const episodes = await getPublicEpisodes();
+  return episodes.map((episode) => ({ params: { slug: episode.data.slug }, props: { episode } }));
+}
+
+interface Props {
+  episode: CollectionEntry<"episodes">;
+}
+
+const { episode } = Astro.props;
+const { data } = episode;
+const publicEpisodes = await getPublicEpisodes();
+const currentIndex = publicEpisodes.findIndex(({ data: item }) => item.slug === data.slug);
+const previousEpisode = publicEpisodes[currentIndex - 1];
+const nextEpisode = publicEpisodes[currentIndex + 1];
+const runtime = formatRuntime(data.runtimeSeconds);
+const isReleased = data.status === "released";
+const releaseDate = data.releaseDate
+  ? new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(
+      new Date(`${data.releaseDate}T00:00:00Z`),
+    )
+  : null;
+
+if (isReleased && !siteConfiguration.streamCustomerCode) {
+  throw new Error(`Released episode ${data.id} requires a Stream customer code.`);
+}
+---
+
+<BaseLayout
+  title={data.seo?.title ?? `${data.title} — Correlius`}
+  description={data.seo?.description ?? data.shortSynopsis}
+  socialImage={data.socialImage}
+  type="video.other"
+>
+  <nav class="shell breadcrumb" aria-label="Breadcrumb">
+    <ol>
+      <li><a href="/">Home</a></li>
+      <li><a href="/watch/">Watch</a></li>
+      <li aria-current="page">{data.title}</li>
+    </ol>
+  </nav>
+
+  <header class="episode-header">
+    <div class="shell episode-header-inner">
+      <p class="eyebrow">{isReleased ? `Episode ${data.sequence}` : "Coming soon"}</p>
+      <h1>{data.title}</h1>
+      <p class="page-lead">{data.shortSynopsis}</p>
+    </div>
+  </header>
+
+  <section class="section section-paper">
+    <div class="shell episode-detail-grid">
+      <div class="content-stack">
+        {
+          isReleased && siteConfiguration.streamCustomerCode ? (
+            <StreamPlayer
+              customerCode={siteConfiguration.streamCustomerCode}
+              poster={data.poster!}
+              streamUid={data.streamUid!}
+              title={data.title}
+            />
+          ) : (
+            <Notice title="This episode is not yet playable">
+              <p>A genuine coming-soon record never displays an empty or simulated player.</p>
+            </Notice>
+          )
+        }
+
+        <section class="prose" aria-labelledby="synopsis-heading">
+          <h2 id="synopsis-heading">Synopsis</h2>
+          <p>{data.synopsis}</p>
+        </section>
+
+        {
+          data.contentContext && (
+            <section class="prose" aria-labelledby="context-heading">
+              <h2 id="context-heading">Content context</h2>
+              <p>{data.contentContext}</p>
+            </section>
+          )
+        }
+
+        {
+          data.credits.length > 0 && (
+            <section class="prose" aria-labelledby="credits-heading">
+              <h2 id="credits-heading">Credits</h2>
+              <dl class="credits-list">
+                {data.credits.map((credit) => (
+                  <div>
+                    <dt>{credit.role}</dt>
+                    <dd>{credit.name}{credit.note && <span> — {credit.note}</span>}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="episode-facts" aria-label="Episode information">
+        <dl>
+          <div><dt>Status</dt><dd>{isReleased ? "Released" : "Coming soon"}</dd></div>
+          {runtime && <div><dt>Runtime</dt><dd>{runtime}</dd></div>}
+          {data.releaseDate && <div><dt>Release date</dt><dd><time datetime={data.releaseDate}>{releaseDate}</time></dd></div>}
+          <div><dt>Captions</dt><dd>{isReleased ? "English captions available" : "Required before release"}</dd></div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+
+  <nav class="section adjacent-episodes" aria-label="Adjacent episodes">
+    <div class="shell adjacent-grid">
+      <div>
+        {previousEpisode && <a class="text-link" href={`/watch/${previousEpisode.data.slug}/`}>← {previousEpisode.data.title}</a>}
+      </div>
+      <div>
+        {nextEpisode && <a class="text-link" href={`/watch/${nextEpisode.data.slug}/`}>{nextEpisode.data.title} →</a>}
+      </div>
+    </div>
+  </nav>
+</BaseLayout>

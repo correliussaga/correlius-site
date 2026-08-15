@@ -4,7 +4,7 @@ This repository contains the public Correlius.org site. The approved architectur
 
 ## Current implementation stage
 
-Stage 4 implements the safe Astro public shell: Home, Watch, About, Support, For Partners, Privacy, and a custom 404 page. All Astro pages remain `noindex`, use honest unfinished states, and are not approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
+Stage 5 implements the schema-validated public content and episode framework while keeping every unresolved release dependency blocked. The project record remains draft, the episode collection contains no public-eligible film record, all pages remain `noindex`, and nothing is approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
 
 ## Local development
 

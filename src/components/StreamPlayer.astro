@@ -1,0 +1,39 @@
+---
+interface Props {
+  customerCode: string;
+  poster: {
+    src: string;
+    width: number;
+    height: number;
+  };
+  streamUid: string;
+  title: string;
+}
+
+const { customerCode, poster, streamUid, title } = Astro.props;
+const source = `https://customer-${customerCode}.cloudflarestream.com/${streamUid}/iframe`;
+---
+
+<section class="player-section" aria-labelledby="player-heading">
+  <h2 id="player-heading">Watch {title}</h2>
+  <div class="player-frame">
+    <img
+      class="player-poster"
+      src={poster.src}
+      alt=""
+      width={poster.width}
+      height={poster.height}
+      decoding="async"
+    />
+    <iframe
+      src={source}
+      title={`Stream player for ${title}`}
+      allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+  </div>
+  <p class="player-help">
+    Playback does not start automatically. If the player is unavailable, reload this page
+    later; the synopsis and episode information remain available below.
+  </p>
+</section>

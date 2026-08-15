@@ -1,5 +1,5 @@
 import { access, readFile, readdir, stat } from "node:fs/promises";
-import { extname, join } from "node:path";
+import { extname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const buildRoot = fileURLToPath(new URL("../dist", import.meta.url));
@@ -34,6 +34,13 @@ async function filesUnder(directory) {
   return files;
 }
 
+function routeToFile(href) {
+  const path = href.split("#")[0].split("?")[0];
+  if (!path || path === "/") return "index.html";
+  if (path.endsWith("/")) return `${path.slice(1)}index.html`;
+  return path.slice(1);
+}
+
 function capture(content, pattern, label, file) {
   const value = content.match(pattern)?.[1];
   if (!value) throw new Error(`${file}: missing ${label}`);
@@ -43,7 +50,14 @@ function capture(content, pattern, label, file) {
 const titles = new Set();
 const descriptions = new Set();
 
-for (const page of expectedPages) {
+for (const page of expectedPages) await access(join(buildRoot, page));
+
+const allFiles = await filesUnder(buildRoot);
+const htmlPages = allFiles
+  .filter((path) => extname(path) === ".html")
+  .map((path) => relative(buildRoot, path));
+
+for (const page of htmlPages) {
   const path = join(buildRoot, page);
   await access(path);
   const content = await readFile(path, "utf8");
@@ -53,6 +67,16 @@ for (const page of expectedPages) {
   if (!content.includes('id="main-content"')) throw new Error(`${page}: main target missing`);
   if (!content.includes('name="robots" content="noindex, nofollow"')) {
     throw new Error(`${page}: preview noindex directive missing`);
+  }
+  for (const metadata of [
+    'property="og:title"',
+    'property="og:description"',
+    'property="og:url"',
+    'name="twitter:card"',
+    'name="twitter:title"',
+    'name="twitter:description"',
+  ]) {
+    if (!content.includes(metadata)) throw new Error(`${page}: social metadata incomplete`);
   }
   if (!content.includes("Draft notice—final wording requires approval.")) {
     throw new Error(`${page}: draft legal notice missing`);
@@ -78,9 +102,28 @@ for (const page of expectedPages) {
   if (descriptions.has(description)) throw new Error(`${page}: duplicate description`);
   titles.add(title);
   descriptions.add(description);
+
+  for (const href of [...content.matchAll(/\shref="([^"]+)"/gu)].map((match) => match[1])) {
+    if (/^(?:https?:|mailto:|tel:)/u.test(href)) continue;
+    if (href.startsWith("#")) continue;
+    await access(join(buildRoot, routeToFile(href)));
+  }
+
+  for (const source of [...content.matchAll(/\ssrc="(\/[^"]+)"/gu)].map((match) => match[1])) {
+    await access(join(buildRoot, source.slice(1)));
+  }
+
+  const socialImage = content.match(
+    /<meta property="og:image" content="https:\/\/correlius\.org(\/[^"]+)"/u,
+  )?.[1];
+  if (socialImage) {
+    await access(join(buildRoot, socialImage.slice(1)));
+    if (!content.includes(`name="twitter:image" content="https://correlius.org${socialImage}"`)) {
+      throw new Error(`${page}: Open Graph and X social images differ`);
+    }
+  }
 }
 
-const allFiles = await filesUnder(buildRoot);
 const scriptBytes = (
   await Promise.all(
     allFiles.filter((path) => extname(path) === ".js").map(async (path) => (await stat(path)).size),

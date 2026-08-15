@@ -8,13 +8,15 @@
     "npm": ">=10.8.1 <11"
   },
   "scripts": {
-    "build": "npm run check && astro build && npm run verify:build && npm run verify:shell",
+    "build": "npm run check && astro build && npm run verify:build && npm run verify:shell && npm run verify:a11y",
     "check": "astro check",
     "dev": "astro dev",
     "preview": "astro preview",
-    "test": "npm run test:scanner && npm run build",
+    "test": "npm run test:scanner && npm run test:content && npm run build",
+    "test:content": "node scripts/verify-content.mjs",
     "test:scanner": "node scripts/verify-build.mjs --self-test",
     "verify:build": "node scripts/verify-build.mjs",
+    "verify:a11y": "node scripts/verify-accessibility.mjs",
     "verify:shell": "node scripts/verify-public-shell.mjs"
   },
   "dependencies": {

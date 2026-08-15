@@ -1,0 +1,47 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { formatRuntime } from "../content/episode-schema.mjs";
+
+interface Props {
+  episode: CollectionEntry<"episodes">;
+}
+
+const { episode } = Astro.props;
+const { data } = episode;
+const runtime = formatRuntime(data.runtimeSeconds);
+const isReleased = data.status === "released";
+---
+
+<article class="episode-card">
+  {
+    data.thumbnail ? (
+      <img
+        class="episode-thumbnail"
+        src={data.thumbnail.src}
+        alt={data.thumbnail.alt}
+        width={data.thumbnail.width}
+        height={data.thumbnail.height}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="episode-visual" aria-hidden="true">
+        <span>{data.sequence.toString().padStart(2, "0")}</span>
+      </div>
+    )
+  }
+  <div class="episode-card-body">
+    <p class="card-kicker">{isReleased ? `Episode ${data.sequence}` : "Coming soon"}</p>
+    <h2><a href={`/watch/${data.slug}/`}>{data.title}</a></h2>
+    <p>{data.shortSynopsis}</p>
+    <p class="episode-meta">
+      {runtime && <span>{runtime}</span>}
+      <span>{isReleased ? "Released" : "Preview"}</span>
+    </p>
+    <a class="text-link" href={`/watch/${data.slug}/`}>
+      {isReleased ? "Watch episode" : "View episode details"}
+      <span aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>

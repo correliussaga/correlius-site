@@ -1,5 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { getProject, getPublicEpisodes } from "../lib/content";
+
+const project = await getProject();
+const publicEpisodes = await getPublicEpisodes();
+const featuredEpisode = publicEpisodes.find(
+  ({ data }) => data.status === "released" && data.featured,
+);
 ---
 
 <BaseLayout
@@ -8,11 +15,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 >
   <section class="hero">
     <div class="shell hero-inner">
-      <p class="eyebrow">Independent nonprofit fan-film project</p>
-      <h1>A different kind of hero’s journey.</h1>
+      <p class="eyebrow">{project.descriptor}</p>
+      <h1>{project.heroHeading}</h1>
       <p class="hero-copy">
-        Correlius explores character, healing, family, and unconventional strength through
-        a story shaped by the language of science fiction.
+        {project.heroSummary}
       </p>
       <div class="button-row">
         <a class="button button-primary" href="/watch/">Explore the films</a>
@@ -25,18 +31,25 @@ import BaseLayout from "../layouts/BaseLayout.astro";
     <div class="shell section-grid">
       <div>
         <p class="eyebrow">Public site preview</p>
-        <h2 id="current-status-heading">The next chapter is being prepared.</h2>
+        <h2 id="current-status-heading">
+          {featuredEpisode ? "A featured film is ready." : "The next chapter is being prepared."}
+        </h2>
       </div>
       <div class="prose">
+        <p>{featuredEpisode ? featuredEpisode.data.shortSynopsis : project.availabilityMessage}</p>
         <p>
-          The film catalog and full project story are being prepared for this new site.
           Nothing here requires an account, and unfinished material is never presented as
           released.
         </p>
-        <p>
-          You can explore the public sections now, then return as approved films and project
-          information are added.
-        </p>
+        {
+          featuredEpisode && (
+            <p>
+              <a class="text-link" href={`/watch/${featuredEpisode.data.slug}/`}>
+                Watch {featuredEpisode.data.title} <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          )
+        }
       </div>
     </div>
   </section>

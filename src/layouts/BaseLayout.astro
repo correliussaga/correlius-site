@@ -6,9 +6,12 @@ import "../styles/global.css";
 const {
   title = "Correlius",
   description = "Correlius is an independent, nonprofit fan-film project.",
+  socialImage = null,
+  type = "website",
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const socialImageUrl = socialImage ? new URL(socialImage.src, Astro.site) : null;
 ---
 
 <!doctype html>
@@ -19,6 +22,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content="Correlius" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    {socialImageUrl && <meta property="og:image" content={socialImageUrl} />}
+    {socialImageUrl && <meta property="og:image:alt" content={socialImage.alt} />}
+    <meta name="twitter:card" content={socialImageUrl ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {socialImageUrl && <meta name="twitter:image" content={socialImageUrl} />}
+    {socialImageUrl && <meta name="twitter:image:alt" content={socialImage.alt} />}
     <title>{title}</title>
   </head>
   <body>

@@ -1,0 +1,21 @@
+id: replace-with-stable-id
+slug: replace-with-public-slug
+sequence: 1
+title: "Placeholder episode title"
+shortSynopsis: "Placeholder synopsis for authoring only."
+synopsis: "Placeholder full synopsis for authoring only."
+runtimeSeconds: null
+releaseDate: null
+status: draft
+streamUid: null
+captions: []
+thumbnail: null
+poster: null
+socialImage: null
+contentContext: null
+credits: []
+featured: false
+contentApproved: false
+rightsReviewed: false
+creditsReviewed: false
+seo: null

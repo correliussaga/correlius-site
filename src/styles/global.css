@@ -363,6 +363,240 @@ h2 {
   list-style: none;
 }
 
+.episode-grid {
+  display: grid;
+  padding: 0;
+  margin: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+}
+
+.episode-card {
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid #d5cfc3;
+  border-radius: var(--radius);
+  color: var(--ink-950);
+  background: var(--white);
+  box-shadow: 0 1rem 3rem rgb(20 25 35 / 10%);
+}
+
+.episode-visual,
+.episode-thumbnail {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.episode-thumbnail {
+  object-fit: cover;
+}
+
+.episode-visual {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgb(224 170 69 / 20%), transparent 55%),
+    var(--ink-850);
+}
+
+.episode-visual::after {
+  position: absolute;
+  top: 50%;
+  right: 12%;
+  width: 45%;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--white);
+  box-shadow: 0 0 1rem var(--white), 0 0 2.5rem var(--gold);
+  content: "";
+  transform: rotate(-16deg);
+}
+
+.episode-visual span {
+  position: absolute;
+  top: 1rem;
+  left: 1.25rem;
+  color: rgb(255 255 255 / 18%);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.5rem;
+}
+
+.episode-card-body {
+  padding: clamp(1.35rem, 3vw, 2rem);
+}
+
+.episode-card-body h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+.episode-card-body h2 a {
+  text-decoration: none;
+}
+
+.episode-card-body h2 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.15em;
+}
+
+.card-kicker {
+  margin: 0 0 0.45rem;
+  color: #795513;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.episode-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  color: #596576;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.tag-list {
+  display: flex;
+  padding: 0;
+  margin: 1.75rem 0 0;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  list-style: none;
+}
+
+.tag-list li {
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #c8c0b2;
+  border-radius: 999px;
+  color: #4c5664;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.breadcrumb {
+  padding-block: 1.2rem;
+}
+
+.breadcrumb ol {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  list-style: none;
+}
+
+.breadcrumb li:not(:last-child)::after {
+  margin-left: 0.4rem;
+  content: "/";
+}
+
+.episode-header {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+  background: var(--ink-900);
+}
+
+.episode-header h1 {
+  font-size: clamp(3rem, 8vw, 6rem);
+}
+
+.episode-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 0.32fr);
+  gap: clamp(2.5rem, 6vw, 5rem);
+}
+
+.player-section h2,
+.episode-detail-grid .prose h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+}
+
+.player-frame {
+  position: relative;
+  overflow: hidden;
+  padding-top: 56.25%;
+  border-radius: 0.8rem;
+  background: var(--ink-950);
+}
+
+.player-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.player-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-help {
+  color: #566272;
+  font-size: 0.9rem;
+}
+
+.episode-facts dl {
+  margin: 0;
+}
+
+.episode-facts dl > div {
+  padding-block: 1rem;
+  border-bottom: 1px solid #d7d0c4;
+}
+
+.episode-facts dt {
+  color: #606b79;
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.episode-facts dd {
+  margin: 0.25rem 0 0;
+  font-weight: 700;
+}
+
+.credits-list {
+  margin: 0;
+}
+
+.credits-list > div {
+  padding-block: 0.75rem;
+  border-bottom: 1px solid #d7d0c4;
+}
+
+.credits-list dt {
+  color: #606b79;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.credits-list dd {
+  margin: 0.2rem 0 0;
+}
+
+.adjacent-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.adjacent-grid > :last-child {
+  text-align: right;
+}
+
 .info-card {
   min-height: 13rem;
   padding: clamp(1.35rem, 3vw, 2rem);
@@ -514,6 +748,11 @@ h2 {
   }
 
   .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .episode-grid,
+  .episode-detail-grid {
     grid-template-columns: 1fr;
   }
 

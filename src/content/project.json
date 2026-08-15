@@ -1,0 +1,22 @@
+[
+  {
+    "id": "correlius",
+    "status": "draft",
+    "name": "Correlius",
+    "descriptor": "Independent nonprofit fan-film project",
+    "heroHeading": "A different kind of hero’s journey.",
+    "heroSummary": "Correlius explores character, healing, family, and unconventional strength through a story shaped by the language of science fiction.",
+    "missionHeading": "Story after the heroic moment.",
+    "missionParagraphs": [
+      "The project is interested in what comes after survival: how a person remains themselves, lives with what happened, and stays connected to the people around them.",
+      "Its perspective is Black-centered without treating any audience as unwelcome. The films are creative works, not clinical guidance or promises about healing."
+    ],
+    "themes": [
+      "Character",
+      "Healing",
+      "Family",
+      "Unconventional strength"
+    ],
+    "availabilityMessage": "Approved episode records, captions, artwork, credits, and playback details are still being prepared for this site."
+  }
+]

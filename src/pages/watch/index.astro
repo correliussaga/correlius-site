@@ -2,6 +2,10 @@
 import Notice from "../../components/Notice.astro";
 import PageIntro from "../../components/PageIntro.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import EpisodeCard from "../../components/EpisodeCard.astro";
+import { getPublicEpisodes } from "../../lib/content";
+
+const episodes = await getPublicEpisodes();
 ---
 
 <BaseLayout
@@ -16,13 +20,17 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
   <section class="section section-paper" aria-labelledby="catalog-heading">
     <div class="shell content-stack">
-      <Notice title="Films are being prepared">
-        <p>
-          No film is being presented as released on this preview. Approved episode records,
-          captions, artwork, credits, and playback details must pass review before a Watch
-          action appears.
-        </p>
-      </Notice>
+      {
+        episodes.length === 0 && (
+          <Notice title="Films are being prepared">
+            <p>
+              No film is being presented as released on this preview. Approved episode
+              records, captions, artwork, credits, and playback details must pass review
+              before a Watch action appears.
+            </p>
+          </Notice>
+        )
+      }
 
       <div class="section-heading">
         <p class="eyebrow">Catalog design</p>
@@ -33,23 +41,31 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         </p>
       </div>
 
-      <ul class="card-grid" role="list">
-        <li class="info-card">
-          <p class="card-number" aria-hidden="true">01</p>
-          <h3>Clear release status</h3>
-          <p>Only reviewed, playable episodes receive a Watch action.</p>
-        </li>
-        <li class="info-card">
-          <p class="card-number" aria-hidden="true">02</p>
-          <h3>Accessible playback</h3>
-          <p>Released films require reviewed captions and meaningful non-player context.</p>
-        </li>
-        <li class="info-card">
-          <p class="card-number" aria-hidden="true">03</p>
-          <h3>Stable episode pages</h3>
-          <p>Each release will have one shareable page with synopsis, credits, and context.</p>
-        </li>
-      </ul>
+      {
+        episodes.length > 0 ? (
+          <ol class="episode-grid">
+            {episodes.map((episode) => <li><EpisodeCard episode={episode} /></li>)}
+          </ol>
+        ) : (
+          <ul class="card-grid" role="list">
+            <li class="info-card">
+              <p class="card-number" aria-hidden="true">01</p>
+              <h3>Clear release status</h3>
+              <p>Only reviewed, playable episodes receive a Watch action.</p>
+            </li>
+            <li class="info-card">
+              <p class="card-number" aria-hidden="true">02</p>
+              <h3>Accessible playback</h3>
+              <p>Released films require reviewed captions and meaningful non-player context.</p>
+            </li>
+            <li class="info-card">
+              <p class="card-number" aria-hidden="true">03</p>
+              <h3>Stable episode pages</h3>
+              <p>Each release will have one shareable page with synopsis, credits, and context.</p>
+            </li>
+          </ul>
+        )
+      }
     </div>
   </section>
 </BaseLayout>
