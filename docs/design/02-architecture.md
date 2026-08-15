@@ -130,7 +130,7 @@ sequenceDiagram
   alt exact email is allowed
     Access->>Mail: Send single-use PIN
   else email is not allowed
-    Access-->>Partner: Same generic response; no PIN
+    Access-->>Partner: Same generic response - no PIN
   end
   Partner->>Access: Submit PIN
   Access->>Access: Validate PIN and Allow policy
@@ -155,19 +155,19 @@ sequenceDiagram
   participant Email as Cloudflare Email Service
   actor Brian
 
-  Applicant->>Form: Enter minimum fields + accept privacy notice
+  Applicant->>Form: Enter minimum fields and accept privacy notice
   Form->>Worker: POST /api/partner-access
   Worker->>Worker: Enforce method, origin, size, types, lengths
   Worker->>Turnstile: Server-side token validation
-  Turnstile-->>Worker: Valid / invalid
-  Worker->>KV: Read HMAC(normalized email)
+  Turnstile-->>Worker: Valid or invalid
+  Worker->>KV: Read keyed email digest
   alt recent marker exists
-    Worker-->>Applicant: Request already received; manual review pending
+    Worker-->>Applicant: Request already received - manual review pending
   else first valid submission
     Worker->>Email: Send structured notification to Brian
     Email-->>Brian: Submission details
     Worker->>KV: Store digest with 24-hour TTL
-    Worker-->>Applicant: Accessible on-page receipt; no access granted
+    Worker-->>Applicant: Accessible on-page receipt - no access granted
   end
 ```
 
