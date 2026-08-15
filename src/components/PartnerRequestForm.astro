@@ -1,0 +1,102 @@
+---
+import { collaborationTypes, requestLimits } from "../lib/partner-request-contract.mjs";
+
+interface Props {
+  enabled: boolean;
+  siteKey: string | null;
+}
+
+const { enabled, siteKey } = Astro.props;
+if (enabled && !siteKey) throw new Error("An enabled partner request form requires a Turnstile site key.");
+---
+
+<form class="request-form" action="/api/partner-access" method="post">
+  <fieldset disabled={!enabled}>
+    <legend>Partner request details</legend>
+
+    <div class="form-field">
+      <label for="request-name">Name <span aria-hidden="true">*</span></label>
+      <input
+        id="request-name"
+        name="name"
+        type="text"
+        autocomplete="name"
+        maxlength={requestLimits.name}
+        required
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="request-email">Email <span aria-hidden="true">*</span></label>
+      <input
+        id="request-email"
+        name="email"
+        type="email"
+        autocomplete="email"
+        inputmode="email"
+        maxlength={requestLimits.email}
+        required
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="request-affiliation">
+        Organization, forum, podcast, or affiliation <span aria-hidden="true">*</span>
+      </label>
+      <input
+        id="request-affiliation"
+        name="affiliation"
+        type="text"
+        autocomplete="organization"
+        maxlength={requestLimits.affiliation}
+        required
+      />
+    </div>
+
+    <div class="form-field">
+      <label for="request-type">Type of collaboration <span aria-hidden="true">*</span></label>
+      <select id="request-type" name="collaborationType" required>
+        <option value="">Choose one</option>
+        {collaborationTypes.map(({ value, label }) => <option value={value}>{label}</option>)}
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="request-message">Short message <span aria-hidden="true">*</span></label>
+      <p id="request-message-help">Briefly describe the proposed use, format, or conversation.</p>
+      <textarea
+        id="request-message"
+        name="message"
+        rows="7"
+        maxlength={requestLimits.message}
+        aria-describedby="request-message-help"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-consent">
+      <input id="request-privacy" name="privacyConsent" type="checkbox" value="yes" required />
+      <label for="request-privacy">
+        I have read the <a href="/privacy/">privacy notice</a> and understand that this request
+        is reviewed manually and does not grant access. <span aria-hidden="true">*</span>
+      </label>
+    </div>
+
+    {
+      enabled && siteKey && (
+        <div
+          class="cf-turnstile"
+          data-sitekey={siteKey}
+          data-action="partner_request"
+          data-response-field-name="cf-turnstile-response"
+        ></div>
+      )
+    }
+
+    <button class="button button-primary" type="submit">
+      {enabled ? "Submit request" : "Requests are not open yet"}
+    </button>
+  </fieldset>
+</form>
+
+{enabled && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}

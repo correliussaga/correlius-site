@@ -142,6 +142,17 @@ for (const requiredFile of ["_headers", "robots.txt", "scripts/navigation.js"]) 
   await access(join(buildRoot, requiredFile));
 }
 
+const partnerPage = await readFile(join(buildRoot, "for-partners/index.html"), "utf8");
+if (!partnerPage.includes('<form class="request-form" action="/api/partner-access" method="post">')) {
+  throw new Error("for-partners/index.html: request contract form missing");
+}
+if (!/<fieldset disabled>/u.test(partnerPage)) {
+  throw new Error("for-partners/index.html: unconfigured request form is not disabled");
+}
+if (partnerPage.includes("challenges.cloudflare.com/turnstile/v0/api.js")) {
+  throw new Error("for-partners/index.html: Turnstile loaded while request form is disabled");
+}
+
 console.log(
   `Public shell verification passed (${expectedPages.length} pages, ${scriptBytes} JS bytes, ${styleBytes} CSS bytes).`,
 );

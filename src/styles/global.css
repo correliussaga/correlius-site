@@ -648,6 +648,83 @@ h2 {
   content: "";
 }
 
+.request-form {
+  max-width: 50rem;
+  margin-top: 2rem;
+}
+
+.request-form fieldset {
+  display: grid;
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+  border: 1px solid #cbc3b6;
+  border-radius: var(--radius);
+  gap: 1.25rem;
+  background: var(--white);
+}
+
+.request-form fieldset:disabled {
+  opacity: 0.72;
+}
+
+.request-form legend {
+  padding-inline: 0.5rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.form-field label,
+.form-consent label {
+  font-weight: 800;
+}
+
+.form-field p {
+  margin: 0;
+  color: #596576;
+  font-size: 0.9rem;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #8e99a8;
+  border-radius: 0.5rem;
+  color: var(--ink-950);
+  background: var(--white);
+  font: inherit;
+}
+
+.form-field textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+.form-consent {
+  display: grid;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.form-consent input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.2rem 0 0;
+}
+
+.request-form .button {
+  width: fit-content;
+  font: inherit;
+}
+
 .text-link {
   color: #684a12;
   font-weight: 850;

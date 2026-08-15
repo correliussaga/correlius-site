@@ -4,7 +4,7 @@ This repository contains the public Correlius.org site. The approved architectur
 
 ## Current implementation stage
 
-Stage 5 implements the schema-validated public content and episode framework while keeping every unresolved release dependency blocked. The project record remains draft, the episode collection contains no public-eligible film record, all pages remain `noindex`, and nothing is approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
+Stage 6 implements the fail-closed public partner-request boundary and records the external partner platform gates. The request form remains disabled until reviewed Cloudflare bindings, mailbox/DNS configuration, final privacy wording, and production evidence exist. Protected portal code and material remain excluded pending a separate private repository and proven Cloudflare Access boundary. The project record remains draft, the episode collection contains no public-eligible film record, all pages remain `noindex`, and nothing is approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
 
 ## Local development
 

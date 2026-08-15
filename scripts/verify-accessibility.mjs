@@ -53,7 +53,21 @@ for (const path of (await filesUnder(buildRoot)).filter((file) => extname(file) 
   }
 
   for (const button of openingTags(content, "button")) {
-    if (!/\btype="button"/u.test(button)) throw new Error(`${page}: button type missing`);
+    if (!/\btype="(?:button|submit)"/u.test(button)) {
+      throw new Error(`${page}: button type missing`);
+    }
+  }
+
+  for (const control of [
+    ...openingTags(content, "input"),
+    ...openingTags(content, "select"),
+    ...openingTags(content, "textarea"),
+  ]) {
+    if (/\btype="hidden"/u.test(control)) continue;
+    const id = control.match(/\bid="([^"]+)"/u)?.[1];
+    if (!id || !content.includes(`<label for="${id}">`)) {
+      throw new Error(`${page}: form control label missing`);
+    }
   }
 
   if (/(?:>\s*click here\s*<|aria-label="click here")/iu.test(content)) {

@@ -1,6 +1,8 @@
 ---
 import Notice from "../../components/Notice.astro";
 import PageIntro from "../../components/PageIntro.astro";
+import PartnerRequestForm from "../../components/PartnerRequestForm.astro";
+import { siteConfiguration } from "../../config/site";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
@@ -48,6 +50,22 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           No personal information is collected by this preview.
         </p>
       </Notice>
+
+      <section aria-labelledby="request-form-heading">
+        <div class="section-heading">
+          <p class="eyebrow">Request preview</p>
+          <h2 id="request-form-heading">The minimum information needed for review.</h2>
+          <p>
+            The disabled preview below shows the complete request contract. It cannot submit
+            until reviewed privacy, mailbox, Turnstile, rate-limit, KV, and email settings
+            are configured together.
+          </p>
+        </div>
+        <PartnerRequestForm
+          enabled={siteConfiguration.partnerRequestEnabled}
+          siteKey={siteConfiguration.turnstileSiteKey}
+        />
+      </section>
     </div>
   </section>
 </BaseLayout>
