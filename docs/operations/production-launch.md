@@ -17,8 +17,8 @@ This runbook coordinates the final public launch. It is not launch authorization
 1. Merge the reviewed commit through protected `main`; do not bypass required checks.
 2. Observe the correct Cloudflare Pages build and record the public deployment identifier and time in the restricted operational record.
 3. Verify canonical apex and `www` behavior, TLS, enforced response headers, `robots.txt`, sitemap, public routes, two anonymous episodes and captions, external support destination, request delivery, and partner Access denial.
-4. Configure GitHub repository variables `PUBLIC_SMOKE_BASE_URL` and `PUBLIC_SMOKE_EPISODE_URL`, manually dispatch the smoke workflow, and require a pass.
-5. Set `PUBLIC_SMOKE_ENABLED` to `true` only after the manual production run passes. Confirm Brian receives a test workflow-failure notification through GitHub's configured notification path.
+4. Confirm `PUBLIC_SMOKE_BASE_URL` is correct (it defaults to `https://correlius.org`), configure `PUBLIC_SMOKE_EPISODE_URL` for a released episode, manually dispatch the smoke workflow, and require a pass. The episode value switches the always-on hourly check from prelaunch posture to launch-ready indexing and playback checks.
+5. Confirm Brian receives a test workflow-failure notification through GitHub's configured notification path.
 6. Recheck Cloudflare deployment/incident notifications, Stream usage visibility, request outcome metrics, sanitized logs, and Email Service delivery.
 
 ## Ordinary rollback

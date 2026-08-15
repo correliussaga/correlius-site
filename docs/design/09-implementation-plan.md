@@ -245,9 +245,9 @@ WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may
 
 **DEPENDENCIES.** Stable routes from WP-03/WP-08 and actions from WP-04/WP-07/WP-10.
 
-**FILES/AREAS EXPECTED TO CHANGE.** Two Web Analytics configurations; player/action instrumentation; event Worker/Analytics Engine dataset; metric dictionary/dashboard notes; privacy content.
+**FILES/AREAS EXPECTED TO CHANGE.** Edge traffic analytics filters; player/action instrumentation; event Worker/Analytics Engine dataset; metric dictionary/dashboard notes; privacy content.
 
-**IMPLEMENTATION TASKS.** Separate public and partner Web Analytics; verify Stream dashboard/API definitions; instrument enumerated film-start/support/request/contact events only where native products do not; validate allowed event schema; document visits/plays/minutes/inquiries/invitations/donations distinctions; exclude identities/query strings/free text; set retention/access; verify usage stays within Analytics Engine's Free limits and add no paid fallback.
+**IMPLEMENTATION TASKS.** Keep client-side Web Analytics and Network Error Logging disabled; separate edge request metrics by public and partner hostname; verify Stream dashboard/API definitions; instrument enumerated film-start/support/request/contact events only where native products do not; validate allowed event schema; document visits/plays/minutes/inquiries/invitations/donations distinctions; exclude identities/query strings/free text; set retention/access; verify usage stays within Analytics Engine's Free limits and add no paid fallback.
 
 **SECURITY CONSIDERATIONS.** Partner auth logs are restricted and not joined to event/page data. Event endpoint rate-limited and noncritical. No applicant/partner/participant ID or fingerprinting.
 

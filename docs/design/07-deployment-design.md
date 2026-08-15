@@ -137,7 +137,7 @@ No third-party APM/error tracker is added. The existing mandated GitHub platform
 
 ## Cost controls
 
-- Cloudflare Pages, Functions/Workers, KV, Turnstile, Analytics Engine, Web Analytics, WAF/Bot controls, and Access stay on Free tiers.
+- Cloudflare Pages, Functions/Workers, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine, WAF/Bot controls, and Access stay on Free tiers. Client-side Web Analytics and Network Error Logging remain disabled.
 - Access is capped below 50 active partner users. No paid seat or log-retention plan is enabled.
 - GitHub Pro (approximately $4/month) is the fixed near-free cost required for protected branches on the private partner repository.
 - Stream is usage-based: $5 buys 1,000 stored minutes and delivery is $1 per 1,000 minutes. Disable autoplay/preload, enable billing alerts, and review usage monthly.

@@ -3,7 +3,7 @@
 ## Continuous and event-driven checks
 
 - GitHub CI runs the complete locked suite on pull requests and pushes to `main`.
-- After authorized launch, the gated GitHub workflow checks production hourly. A failed run is availability evidence, not an automatic rollback command.
+- The GitHub workflow checks the production shell hourly. Before a released episode URL is configured it verifies the private prelaunch posture; afterward it also verifies public indexing and playback. A failed run is availability evidence, not an automatic rollback command.
 - Cloudflare Pages deployment, security, billing/usage, and relevant provider incident notifications must reach Brian through a tested channel.
 - Review Access authentication logs after approvals, revocations, and suspected misuse within the accepted 24-hour Free-plan window.
 - Review Email Service failures, request rate-limit spikes, or aggregate `provider_error` outcomes without copying request bodies or identities into logs/issues.

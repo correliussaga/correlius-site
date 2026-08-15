@@ -4,7 +4,7 @@ This repository contains the public Correlius.org site. The approved architectur
 
 ## Current implementation stage
 
-Stage 7 completes the repository-owned acceptance and operations package. CI runs the full suite, builds produce deterministic artifact manifests, a deliberately gated hourly production smoke workflow is ready, and the machine-readable launch ledger records every unresolved success criterion. Production authorization remains false: the request form and discovery stay disabled, protected portal code and material remain excluded, the project record remains draft, and the episode collection contains no public-eligible film record. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
+The Astro public shell is deployed at `https://correlius.org` in private prelaunch mode. CI runs the full suite, builds produce deterministic artifact manifests, and the hourly production smoke check verifies the deployed shell before launch and adds indexing/playback checks once a released episode URL is configured. Browser analytics and Network Error Logging remain disabled; Stream and Turnstile load only after a visitor chooses the relevant action. Production discovery, the partner-request form, and final episode publication remain gated by the launch ledger and owner authorization.
 
 ## Local development
 

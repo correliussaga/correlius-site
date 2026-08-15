@@ -16,7 +16,7 @@ const source = `https://customer-${customerCode}.cloudflarestream.com/${streamUi
 
 <section class="player-section" aria-labelledby="player-heading">
   <h2 id="player-heading">Watch {title}</h2>
-  <div class="player-frame">
+  <div class="player-frame" data-stream-player data-player-src={source}>
     <img
       class="player-poster"
       src={poster.src}
@@ -25,15 +25,21 @@ const source = `https://customer-${customerCode}.cloudflarestream.com/${streamUi
       height={poster.height}
       decoding="async"
     />
-    <iframe
-      src={source}
-      title={`Stream player for ${title}`}
-      allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-      allowfullscreen
-    ></iframe>
+    <button
+      class="player-load-button"
+      type="button"
+      data-stream-load
+      data-player-title={`Stream player for ${title}`}
+      aria-describedby="player-privacy-note"
+    >
+      Load video player
+    </button>
   </div>
-  <p class="player-help">
-    Playback does not start automatically. If the player is unavailable, reload this page
-    later; the synopsis and episode information remain available below.
+  <p class="player-help" id="player-privacy-note" data-stream-status aria-live="polite">
+    The Cloudflare Stream player loads only after you choose it, and playback does not start
+    automatically. If the player is unavailable, the synopsis and episode information remain
+    available below.
   </p>
 </section>
+
+<script is:inline src="/scripts/stream-player.js" defer></script>

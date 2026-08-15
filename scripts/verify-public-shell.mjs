@@ -138,8 +138,32 @@ const styleBytes = (
 if (scriptBytes > 10_000) throw new Error(`JavaScript budget exceeded: ${scriptBytes} bytes`);
 if (styleBytes > 30_000) throw new Error(`CSS budget exceeded: ${styleBytes} bytes`);
 
-for (const requiredFile of ["_headers", "robots.txt", "scripts/navigation.js"]) {
+for (const requiredFile of [
+  "_headers",
+  "robots.txt",
+  "scripts/navigation.js",
+  "scripts/partner-request.js",
+  "scripts/stream-player.js",
+]) {
   await access(join(buildRoot, requiredFile));
+}
+
+const responseHeaders = await readFile(join(buildRoot, "_headers"), "utf8");
+if (!responseHeaders.includes("Content-Security-Policy:")) {
+  throw new Error("_headers: enforced Content-Security-Policy missing");
+}
+if (responseHeaders.includes("Content-Security-Policy-Report-Only:")) {
+  throw new Error("_headers: Content-Security-Policy remains report-only");
+}
+if (!responseHeaders.includes("frame-src https://challenges.cloudflare.com https://*.cloudflarestream.com")) {
+  throw new Error("_headers: click-to-load providers are missing from frame-src");
+}
+
+for (const page of htmlPages) {
+  const content = await readFile(join(buildRoot, page), "utf8");
+  if (/static\.cloudflareinsights\.com|data-cf-beacon|beacon\.min\.js/iu.test(content)) {
+    throw new Error(`${page}: client-side analytics beacon detected`);
+  }
 }
 
 const partnerPage = await readFile(join(buildRoot, "for-partners/index.html"), "utf8");
@@ -151,6 +175,26 @@ if (!/<fieldset disabled>/u.test(partnerPage)) {
 }
 if (partnerPage.includes("challenges.cloudflare.com/turnstile/v0/api.js")) {
   throw new Error("for-partners/index.html: Turnstile loaded while request form is disabled");
+}
+
+const partnerScript = await readFile(join(buildRoot, "scripts/partner-request.js"), "utf8");
+for (const setting of [
+  '"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"',
+  'execution: "execute"',
+  'appearance: "interaction-only"',
+  '"response-field-name": "cf-turnstile-response"',
+]) {
+  if (!partnerScript.includes(setting)) {
+    throw new Error(`scripts/partner-request.js: missing privacy-preserving setting ${setting}`);
+  }
+}
+
+const streamScript = await readFile(join(buildRoot, "scripts/stream-player.js"), "utf8");
+if (!streamScript.includes('button?.addEventListener("click"')) {
+  throw new Error("scripts/stream-player.js: player is not click-to-load");
+}
+if (streamScript.includes("autoplay")) {
+  throw new Error("scripts/stream-player.js: autoplay capability detected");
 }
 
 console.log(

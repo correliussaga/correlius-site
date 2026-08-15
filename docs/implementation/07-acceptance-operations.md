@@ -8,8 +8,8 @@ Stage 7 completes the repository-owned portion of the seven-stage Correlius plan
 
 - GitHub CI now runs the complete locked test suite, including content, request, boundary, smoke self-test, launch-ledger audit, build, shell, and static accessibility checks.
 - Every static build generates a sorted SHA-256 manifest for its deployable files. The build boundary verifier requires the manifest and validates it before an artifact can be treated as ready for preview.
-- An hourly GitHub production smoke workflow is present but gated by `PUBLIC_SMOKE_ENABLED`. With the variable absent or false, scheduled runs do not make production requests.
-- When deliberately enabled, the smoke check requires canonical HTTPS public and released-episode URLs. It checks six core routes, one released episode, production indexing posture, canonical URLs, enforced security headers, `robots.txt`, the request endpoint's GET rejection/no-store behavior, and the referenced Cloudflare Stream player.
+- An hourly GitHub production smoke workflow always checks the canonical HTTPS public shell. Without a released-episode variable it verifies the intended private prelaunch indexing posture; with one configured it switches to launch-ready discovery and playback checks.
+- The smoke check covers six core routes, canonical URLs, enforced security headers, absence of Cloudflare analytics/NEL browser reporting, `robots.txt`, and the request endpoint's GET rejection/no-store behavior. Launch-ready mode additionally checks a released episode and its click-to-load Cloudflare Stream source.
 - `docs/acceptance/launch-readiness.json` is the source-of-truth launch ledger. Its validator requires exactly 13 success criteria, evidence for every passed criterion, a blocker for every blocked criterion, and explicit owner authorization.
 - `npm run audit:launch` verifies ledger integrity without claiming readiness. `npm run verify:launch` is intentionally failing while any criterion is blocked or production authorization is absent.
 - Owner runbooks now cover launch evidence, monitoring/maintenance, measurement language, security reporting, incident classification, rollback, backups, costs, and the private legal-plan boundary.
@@ -25,7 +25,7 @@ The architecture-level amendments in AAD-06, AAD-07, and AAD-10 remain governing
 - `finalLegalCopyApproved`, `publicDiscoveryEnabled`, and `partnerRequestEnabled` remain false.
 - No public episode is released and no Stream customer code, social image, or Fractured Atlas URL is configured.
 - No monitored address is invented, so `/.well-known/security.txt` is not published yet.
-- The smoke workflow has no configured production variables and scheduled requests remain disabled.
+- The smoke workflow uses `https://correlius.org` by default and runs in prelaunch mode until a released episode URL is configured.
 - No Cloudflare, GitHub, registrar, email, or legal-system action was performed.
 - No protected partner page, file, allowlist, identity, or Access credential entered this repository.
 

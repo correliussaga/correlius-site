@@ -18,12 +18,20 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     <div class="shell section-grid">
       <div>
         <p class="eyebrow">Current preview</p>
-        <h2>No request form or analytics is active.</h2>
+        <h2>No advertising trackers or visitor profiles.</h2>
       </div>
       <div class="prose">
         <p>
-          This static preview does not submit personal information, grant partner access,
-          load advertising trackers, or connect public visits to protected partner activity.
+          Correlius does not use advertising trackers, analytics cookies, session replay,
+          visitor profiles, or client-side audience analytics. This static preview does not
+          submit personal information or connect public visits to protected partner activity.
+        </p>
+        <p>
+          Cloudflare hosts and protects this site. Like any web host, it processes ordinary
+          request and security information such as IP address, request headers, requested path,
+          and security events. Correlius uses aggregate edge traffic for routine operations and
+          may review limited security information when investigating abuse or failure. It does
+          not use ordinary public-visit data to identify or profile visitors.
         </p>
         <p>
           Before the request form is enabled, the final notice will identify the fields,
@@ -33,7 +41,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <ul>
           <li>Name, email, affiliation, collaboration type, and a short message are emailed only to Brian’s verified destination for manual review.</li>
           <li>A keyed digest of the normalized email—not the address itself—is kept in Cloudflare KV for 24 hours to suppress recent duplicates.</li>
-          <li>Cloudflare Turnstile verifies the request, and aggregate outcomes contain no applicant identity or message.</li>
+          <li>Cloudflare Turnstile loads only when submission is attempted, verifies the request, and aggregate outcomes contain no applicant identity or message.</li>
           <li>The applicant receives an on-page receipt after accepted delivery; no applicant confirmation email is sent.</li>
           <li>The request cannot create an account, change the approved-email list, or grant access.</li>
         </ul>

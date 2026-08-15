@@ -4,8 +4,8 @@ Correlius measurement is aggregate and separated by surface. It is operational e
 
 | Measure | Source | Meaning | Must not be called |
 |---|---|---|---|
-| Public page visit | Public Cloudflare Web Analytics property | An approximate public page load/visit under the provider's current definition | A viewer, play, person, or supporter |
-| Partner page visit | Separate partner Web Analytics property | Aggregate use of the protected surface | A named partner action or Access approval |
+| Public page visit | Cloudflare edge HTTP Traffic Analytics filtered to the public hostname | An approximate request/page-traffic measure under the provider's current definition | A viewer, play, person, or supporter |
+| Partner page visit | Cloudflare edge HTTP Traffic Analytics filtered to the protected hostname | Aggregate request traffic to the protected surface | A named partner action or Access approval |
 | Film play/start | Cloudflare Stream Analytics, after its definition is verified | Provider-recorded playback start/view | A completed viewing or unique person unless the provider definition proves it |
 | Approximate viewing minutes | Cloudflare Stream Analytics | Delivered/watch minutes under the provider's current aggregation | Attention, comprehension, or impact |
 | Partner request accepted | Analytics Engine outcome `accepted` | Reviewer notification accepted and the 24-hour marker written | Approval, invitation, or partner access |
@@ -19,6 +19,7 @@ Correlius measurement is aggregate and separated by surface. It is operational e
 
 - Analytics Engine request events contain only one approved outcome and a constant request index.
 - No email, name, affiliation, message, IP address, digest, Access identity, partner address, participant evidence ID, query string, arbitrary route, or free text enters an analytics payload.
-- Public and partner Web Analytics use separate properties and are not joined to Access logs, mailbox records, Stream identities, donations, or research data.
+- Client-side Cloudflare Web Analytics and Network Error Logging are disabled, so Correlius does not add an analytics beacon or NEL reporting endpoint to visitors' browsers.
+- Public and partner edge traffic is separated by hostname and is not joined to Access logs, mailbox records, Stream identities, donations, or research data.
 - Analytics failure never blocks public viewing, external support navigation, protected contact, or an otherwise valid request.
 - Metric definitions and provider retention are rechecked before launch and after material provider changes. Reports state definitions and limitations beside totals.

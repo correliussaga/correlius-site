@@ -102,7 +102,7 @@ Start with a report-only CSP in preview, eliminate violations, then enforce in p
 - `object-src 'none'`
 - `frame-ancestors 'none'` (or equivalent X-Frame-Options `DENY` as legacy defense)
 - `form-action 'self'`
-- narrowly enumerated `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-src`, and `media-src` for Cloudflare Stream, Turnstile, Web Analytics, and first-party endpoints only
+- narrowly enumerated `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-src`, and `media-src` for Cloudflare Stream, Turnstile, and first-party endpoints only
 - no `'unsafe-eval'`; avoid `'unsafe-inline'` through hashes/nonces or static external scripts
 - `upgrade-insecure-requests` after preview validation
 
@@ -231,13 +231,13 @@ US-21 creates a private operational document, not site functionality. Store it i
 | Email Service logs | Delivery diagnosis | Recipient metadata | Restricted; use only for delivery/abuse |
 | Access authentication logs | Approval/use/security review | Yes, identity-bearing | Free plan retains 24 hours; review after approval/incident and accept or amend US-24 |
 | Stream analytics/status | Playback and availability | Aggregate | Alert/check availability and trends |
-| Web Analytics/Analytics Engine | Utility metrics | Aggregate only | No individual profiling |
+| Edge HTTP Traffic Analytics/Analytics Engine | Utility metrics | Aggregate only | No browser analytics beacon or individual profiling |
 
 Cloudflare's free notifications are configured for Pages deployment failures, security events where available, billing/usage, and provider incidents. A scheduled GitHub Actions smoke check can request the public site and one Stream playback resource within GitHub's included CI minutes and notify on workflow failure. Cloudflare standalone Health Checks require Pro or higher and are excluded. Public documentation also lists no on-demand Stream per-asset availability notification. US-22's exact requirement for Cloudflare-built-in site and Stream delivery alerts is therefore **NO-GO AS WRITTEN**; the free replacement requires amending it to allow Cloudflare Incident Alerts plus GitHub's scheduled smoke check.
 
 ## Cost-security guardrail
 
-- Use Cloudflare Free tiers for Pages, Workers/Functions, KV, Turnstile, Analytics Engine, Web Analytics, WAF/Bot Fight features, and Access below 50 active users.
+- Use Cloudflare Free tiers for Pages, Workers/Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine, WAF/Bot Fight features, and Access below 50 active users. Keep client-side Web Analytics and Network Error Logging disabled.
 - Use GitHub Pro only because enforced branch protection on a private repository is required by US-24; at approximately $4/month it is the only fixed near-free security upgrade.
 - Do not enable Cloudflare Pro Health Checks, Workers Paid for applicant email, paid Access seats/retention, Enterprise Logpush, advanced Bot Management, or third-party APM.
 - Cloudflare Stream remains usage-priced; disable autoplay/preload, configure billing alerts, and review usage monthly. No security feature may trigger a plan upgrade automatically.

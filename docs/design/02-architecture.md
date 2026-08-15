@@ -4,7 +4,7 @@
 
 The MVP is a **static-first, edge-hosted, two-surface architecture**. Two independent static sites are built from GitHub and deployed to separate Cloudflare Pages projects. Cloudflare Access forms the front-door authorization boundary for every partner hostname and deployment URL. A single narrow Worker handles the only public write operation (partner-access request), and an equally narrow first-party event endpoint records the few actions Cloudflare's native page/video analytics do not measure.
 
-This is not a single-page application, server-rendered application, microservice estate, or database-backed CMS. Pages are generated at build time. Client JavaScript is limited to the Stream embed, Turnstile/form enhancement, navigation behavior where unavoidable, and consent-free aggregate event calls.
+This is not a single-page application, server-rendered application, microservice estate, or database-backed CMS. Pages are generated at build time. Client JavaScript is limited to visitor-initiated Stream and Turnstile loading, navigation behavior where unavoidable, and narrowly enumerated first-party aggregate event calls.
 
 ## Component inventory and MVP justification
 
@@ -20,8 +20,8 @@ This is not a single-page application, server-rendered application, microservice
 | Turnstile | Form spam control | US-08, US-25 |
 | KV duplicate marker | Flags normalized email for 24 hours | US-08; smallest state that meets duplicate detection |
 | Email Service | Notification to Brian's verified destination | US-08, US-28 |
-| Web Analytics (two sites) | Aggregate page/visit measurement by surface | US-19, US-22 |
-| Analytics Engine event dataset | First-party starts/clicks/submissions/contact events | US-19 metrics unavailable as Web Analytics custom events |
+| Edge HTTP Traffic Analytics | Aggregate request/page-traffic measurement separated by hostname | US-19, US-22 |
+| Analytics Engine event dataset | First-party starts/clicks/submissions/contact events | US-19 action metrics unavailable from aggregate edge traffic |
 | GitHub repositories | Versioning, review, branch/dependency controls | US-14, US-16, US-24, US-26 |
 | Fractured Atlas | Donation destination and payment processor | US-07, US-13 |
 
@@ -49,7 +49,7 @@ flowchart TB
     TS[Turnstile validation]
     KV[(KV: HMAC email marker, 24h TTL)]
     ES[Email Service]
-    WA[Web Analytics]
+    ETA[Edge HTTP Traffic Analytics]
     AE[(Analytics Engine)]
     ST[Stream]
   end
@@ -67,8 +67,8 @@ flowchart TB
   FW --> TS
   FW --> KV
   FW --> ES
-  PUB --> WA
-  PART --> WA
+  PUB --> ETA
+  PART --> ETA
   PUB --> AE
   PART --> AE
   V -->|donate| FA[Fractured Atlas]
@@ -189,7 +189,7 @@ The applicant confirmation requirement is satisfied by the server-rendered succe
 
 ## Cost architecture
 
-- **Free-tier services:** Pages, Workers/Pages Functions, KV, Turnstile, Web Analytics, Analytics Engine within published quotas, and Cloudflare Access for fewer than 50 active users.
+- **Free-tier services:** Pages, Workers/Pages Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine within published quotas, and Cloudflare Access for fewer than 50 active users.
 - **Near-free required costs:** existing domain renewal; Stream at $5 per 1,000 stored minutes prepaid plus $1 per 1,000 delivered minutes; GitHub Pro at approximately $4/month so the private partner repository can enforce branch protection.
 - **Spend controls:** no autoplay or video preload, Stream usage/billing alerts, free-tier request limits, no automatic plan upgrades, and a monthly cost review.
 - **Explicitly rejected paid features:** Cloudflare Pro Health Checks, Workers Paid just for applicant email, paid Access seats/30-day logs, Enterprise Logpush/Bot Management, and third-party monitoring/APM.
@@ -209,15 +209,15 @@ Measurement is intentionally separated by source and vocabulary:
 
 | Metric | Source | Instrumentation | Limitation |
 |---|---|---|---|
-| Public film-page visits | Public Web Analytics | Native page beacon / edge analytics | Visits are not plays |
+| Public film-page visits | Edge HTTP Traffic Analytics filtered to the public hostname | Provider edge request metrics; no browser analytics beacon | Requests/visits are not plays or unique people |
 | Film starts | Stream analytics where definition matches; otherwise first-party `player_start` event | Stream/player event listener | Requires custom instrumentation to define “start” consistently |
 | Approximate viewing minutes | Stream Analytics dashboard/API | Native Stream server-side analytics | Approximate; verify available aggregation before launch |
 | Support-link selections | Analytics Engine | First-party click event before external navigation | Selection is not a donation |
 | Partner-access requests | Analytics Engine | Server records only successful/duplicate outcome, no identity | Request is not approval |
-| Authenticated partner visits | Separate partner Web Analytics + Access authentication logs | Native; Access proves authentication | Page analytics is aggregate; auth logs are identity-bearing and restricted |
+| Authenticated partner visits | Edge HTTP Traffic Analytics filtered to the partner hostname + Access authentication logs | Edge metrics remain aggregate; Access proves authentication | Request analytics is aggregate; auth logs are identity-bearing and restricted |
 | Collaboration-contact actions | Analytics Engine | First-party click/form action | Action is not a completed conversation/invitation |
 
-Cloudflare Web Analytics does not provide custom events; the named action metrics therefore require explicit first-party instrumentation. The event endpoint accepts only an enumerated event name, surface, route category, and timestamp bucket; it rejects free text and identifiers. Survey evidence stays in separate content/storage and is never joined to website analytics.
+Client-side Cloudflare Web Analytics and Network Error Logging remain disabled, avoiding an analytics beacon or NEL reporting endpoint in visitors' browsers. Named action metrics require explicit first-party instrumentation. The event endpoint accepts only an enumerated event name, surface, route category, and timestamp bucket; it rejects free text and identifiers. Survey evidence stays in separate content/storage and is never joined to website analytics.
 
 ## Major data flows
 
@@ -261,7 +261,7 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 - **AD-03:** standalone Worker route for partner requests, Turnstile, KV HMAC marker (24 hours), and Cloudflare Email Service.
 - **AD-04:** no signed Stream URLs for public films; use allowed origins. This preserves anonymous playback and prevents casual off-domain embedding, not copying.
 - **AD-05:** eight-hour Access application/policy session; explicit logout; remove email and revoke current token for urgent revocation.
-- **AD-06:** two separate Web Analytics properties plus a minimal Analytics Engine dataset for custom action events.
+- **AD-06:** edge HTTP traffic metrics separated by hostname plus a minimal Analytics Engine dataset for approved custom action events; no client-side Web Analytics or Network Error Logging.
 - **AD-07:** partner files are deployed as ordinary static assets only because the entire origin path is gated by Access; there are no public object-storage URLs.
 - **AD-08:** static public pages use WCAG 2.2 AA as the test baseline.
 
@@ -295,7 +295,6 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 - [Cloudflare Stream allowed origins](https://developers.cloudflare.com/stream/viewing-videos/securing-your-stream/)
 - [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
 - [Cloudflare Email Service](https://developers.cloudflare.com/email-service/get-started/send-emails/)
-- [Cloudflare Web Analytics custom-event limitation](https://developers.cloudflare.com/web-analytics/faq/)
 - [Cloudflare available notifications](https://developers.cloudflare.com/notifications/notification-available/)
 - [Cloudflare Health Check notifications](https://developers.cloudflare.com/health-checks/how-to/health-checks-notifications/)
 - [Cloudflare Stream pricing](https://developers.cloudflare.com/stream/pricing/)

@@ -30,7 +30,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 | US-16 | Low-maintenance content | 05, 07 | Content gates; Git/deployment pipeline | GitHub, schemas, Pages atomic builds/rollback | WP-01, WP-13 | Routine content change, induced failed build, rollback exercise; no DB/CMS/auth code change | DESIGN COMPLETE |
 | US-17 | Honest legal posture | 03, 06 | Footer/disclaimer; Legal/IP document | Global footer, approved public/partner summaries | WP-06, WP-14 | Every-page footer crawl; rights/credit review; no memo; cross-surface consistency | DESIGN COMPLETE |
 | US-18 | Protect participant/partner data | 01, 04, 06 | Classification; boundary; privacy separation | Separate repos/projects, Access, log redaction, private storage | WP-07–WP-10, WP-12 | Git/history/build/output scans; direct-file denial; raw/identifier/secret absence; noindex header | DESIGN COMPLETE |
-| US-19 | Privacy-conscious measurement | 02 | Analytics architecture | Web Analytics, Stream Analytics, Analytics Engine, Access logs | WP-11 | Metric dictionary/event tests; surface separation; payload/privacy audit; no survey join | DESIGN COMPLETE |
+| US-19 | Privacy-conscious measurement | 02 | Analytics architecture | Edge HTTP Traffic Analytics, Stream Analytics, Analytics Engine, Access logs | WP-11 | Metric dictionary/event tests; hostname separation; payload/privacy audit; no browser beacon or survey join | DESIGN COMPLETE |
 | US-20 | Search/social discovery | 03 | SEO/social rules | Static metadata, canonical, sitemap, robots | WP-06 | Metadata crawler; social preview tools; public-only sitemap; partner noindex/absence | DESIGN COMPLETE |
 | US-21 | Legal/IP inquiry response | 06, 07 | Legal/IP response; removal/recovery | Private operational document, Stream/Pages controls | WP-14 | Private plan existence/review/tabletop; authority/contact and cross-copy checks | DESIGN COMPLETE |
 | US-22 | Fast, reliable site | 03, 07 | Responsive/performance; monitoring/failures | Static Pages/CDN, optimized assets, free incident/deploy alerts, GitHub smoke check | WP-02, WP-04, WP-13 | Performance/cache/deploy tests; free smoke-check alert; requirement amendment | NO-GO AS WRITTEN |
@@ -85,7 +85,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 
 | Capability | Cost classification | Decision |
 |---|---|---|
-| Pages/static delivery, Workers/Functions, KV, Turnstile, Web Analytics, Analytics Engine | Free within published quotas | Include; alert/review before any quota or pricing change |
+| Pages/static delivery, Workers/Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine | Free within published quotas | Include; keep browser analytics/NEL disabled; alert/review before any quota or pricing change |
 | Cloudflare Access | Free below 50 active users; Access logs retained 24 hours | Include with 50-user cap; US-24 retention remains an owner decision |
 | Cloudflare Stream | Near-free usage pricing: $5 per 1,000 stored minutes and $1 per 1,000 delivered minutes | Include because explicitly required; no autoplay/preload and billing alerts |
 | GitHub Pro for private-repository branch protection | Approximately $4/month | Include only if Brian confirms this is near-free; otherwise US-24 is no-go |

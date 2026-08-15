@@ -541,6 +541,27 @@ h2 {
   object-fit: cover;
 }
 
+.player-load-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-height: 3.25rem;
+  padding: 0.75rem 1.2rem;
+  border: 2px solid var(--gold-light);
+  border-radius: 999px;
+  color: var(--ink-950);
+  background: var(--gold-light);
+  box-shadow: var(--shadow);
+  font: inherit;
+  font-weight: 850;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+.player-load-button:hover {
+  background: var(--white);
+}
+
 .player-help {
   color: #566272;
   font-size: 0.9rem;
@@ -723,6 +744,17 @@ h2 {
 .request-form .button {
   width: fit-content;
   font: inherit;
+}
+
+.turnstile-container:empty {
+  display: none;
+}
+
+.request-status {
+  min-height: 1.5em;
+  margin: 0;
+  color: #455161;
+  font-weight: 750;
 }
 
 .text-link {

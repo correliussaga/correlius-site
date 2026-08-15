@@ -138,7 +138,7 @@ The target operating model is free-tier infrastructure plus only unavoidable nea
 
 | Service | Cost posture | Guardrail |
 |---|---|---|
-| Cloudflare Pages, Workers/Functions, KV, Turnstile, Web Analytics, Analytics Engine | Free-tier target | Stay within documented free quotas; do not auto-upgrade |
+| Cloudflare Pages, Workers/Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine | Free-tier target | Stay within documented free quotas; keep browser analytics/NEL disabled; do not auto-upgrade |
 | Cloudflare Access | Free for fewer than 50 active users | Cap the MVP at 50 active partner seats; revoke inactive users |
 | Cloudflare Stream | Required usage-based near-free service | Prepaid storage is $5 per 1,000 stored minutes; delivery is $1 per 1,000 delivered minutes; no autoplay/preload and billing alerts |
 | GitHub | Free public repository; private partner branch protection requires GitHub Pro (about $4/month) | Approve this near-free baseline or US-24 branch protection is a no-go |

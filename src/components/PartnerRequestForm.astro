@@ -10,7 +10,12 @@ const { enabled, siteKey } = Astro.props;
 if (enabled && !siteKey) throw new Error("An enabled partner request form requires a Turnstile site key.");
 ---
 
-<form class="request-form" action="/api/partner-access" method="post">
+<form
+  class="request-form"
+  action="/api/partner-access"
+  method="post"
+  data-partner-request-form={enabled ? "enabled" : undefined}
+>
   <fieldset disabled={!enabled}>
     <legend>Partner request details</legend>
 
@@ -85,13 +90,14 @@ if (enabled && !siteKey) throw new Error("An enabled partner request form requir
     {
       enabled && siteKey && (
         <div
-          class="cf-turnstile"
+          class="turnstile-container"
           data-sitekey={siteKey}
-          data-action="partner_request"
-          data-response-field-name="cf-turnstile-response"
+          data-turnstile-container
         ></div>
       )
     }
+
+    {enabled && <p class="request-status" role="status" aria-live="polite" data-request-status></p>}
 
     <button class="button button-primary" type="submit">
       {enabled ? "Submit request" : "Requests are not open yet"}
@@ -99,4 +105,4 @@ if (enabled && !siteKey) throw new Error("An enabled partner request form requir
   </fieldset>
 </form>
 
-{enabled && <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>}
+{enabled && <script is:inline src="/scripts/partner-request.js" defer></script>}
