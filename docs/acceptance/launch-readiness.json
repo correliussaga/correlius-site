@@ -78,8 +78,8 @@
     {
       "id": "success-13",
       "status": "blocked",
-      "evidence": ["Pinned CI and preview response-header configuration are present in the repository."],
-      "blocker": "Production HTTPS/HSTS/CSP, SSL, DNSSEC, email authentication, 2FA, branch protection, scoped integration, alert delivery, and dated configuration evidence are absent."
+      "evidence": ["Pinned CI and enforced response-header configuration are present in the repository.", "Production HTTPS, HSTS, enforced CSP, Full (strict) SSL, tracker/NEL removal, and the monitored RFC 9116 security contact have dated verification evidence."],
+      "blocker": "DNSSEC completion, email authentication, 2FA, branch protection, scoped-integration review, alert delivery, and security-report delivery/triage evidence remain incomplete."
     }
   ]
 }

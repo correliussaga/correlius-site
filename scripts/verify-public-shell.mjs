@@ -140,6 +140,7 @@ if (styleBytes > 30_000) throw new Error(`CSS budget exceeded: ${styleBytes} byt
 
 for (const requiredFile of [
   "_headers",
+  ".well-known/security.txt",
   "robots.txt",
   "scripts/navigation.js",
   "scripts/partner-request.js",
@@ -157,6 +158,27 @@ if (responseHeaders.includes("Content-Security-Policy-Report-Only:")) {
 }
 if (!responseHeaders.includes("frame-src https://challenges.cloudflare.com https://*.cloudflarestream.com")) {
   throw new Error("_headers: click-to-load providers are missing from frame-src");
+}
+
+const securityText = await readFile(join(buildRoot, ".well-known/security.txt"), "utf8");
+const securityLines = securityText.trim().split(/\r?\n/u);
+const expectedSecurityLines = [
+  "Contact: mailto:contact@correlius.org",
+  "Expires: 2027-08-01T00:00:00Z",
+  "Preferred-Languages: en",
+  "Canonical: https://correlius.org/.well-known/security.txt",
+];
+if (securityLines.length !== expectedSecurityLines.length) {
+  throw new Error("security.txt: unexpected or missing fields");
+}
+for (const line of expectedSecurityLines) {
+  if (!securityLines.includes(line)) throw new Error(`security.txt: missing ${line}`);
+}
+const securityExpiry = Date.parse(
+  securityLines.find((line) => line.startsWith("Expires: "))?.slice("Expires: ".length) ?? "",
+);
+if (!Number.isFinite(securityExpiry) || securityExpiry <= Date.now()) {
+  throw new Error("security.txt: Expires must be a valid future RFC 3339 timestamp");
 }
 
 for (const page of htmlPages) {

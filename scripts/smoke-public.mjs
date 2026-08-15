@@ -98,6 +98,32 @@ export async function smokePublic({ baseUrl, episodeUrl = null, fetchImplementat
     throw new Error("/robots.txt: pre-launch discovery is unexpectedly enabled.");
   }
 
+  const securityUrl = new URL("/.well-known/security.txt", base);
+  const securityResponse = await request(fetchImplementation, securityUrl);
+  if (!securityResponse.ok) {
+    throw new Error(`/.well-known/security.txt: returned HTTP ${securityResponse.status}.`);
+  }
+  requireSecurityHeaders(securityResponse, "/.well-known/security.txt");
+  if (!securityResponse.headers.get("Content-Type")?.toLowerCase().startsWith("text/plain")) {
+    throw new Error("/.well-known/security.txt: did not return plain text.");
+  }
+  const securityText = await securityResponse.text();
+  for (const field of [
+    "Contact: mailto:contact@correlius.org",
+    "Preferred-Languages: en",
+    "Canonical: https://correlius.org/.well-known/security.txt",
+  ]) {
+    if (!securityText.split(/\r?\n/u).includes(field)) {
+      throw new Error(`/.well-known/security.txt: missing ${field}`);
+    }
+  }
+  const securityExpiry = Date.parse(
+    securityText.match(/^Expires:\s*(\S+)\s*$/imu)?.[1] ?? "",
+  );
+  if (!Number.isFinite(securityExpiry) || securityExpiry <= Date.now()) {
+    throw new Error("/.well-known/security.txt: Expires is missing, invalid, or stale.");
+  }
+
   const requestEndpoint = new URL("/api/partner-access", base);
   const endpointResponse = await request(fetchImplementation, requestEndpoint);
   if (endpointResponse.status !== 405 || endpointResponse.headers.get("Allow") !== "POST") {
@@ -153,6 +179,19 @@ async function selfTest() {
     }
     if (url.pathname === "/robots.txt") {
       return response({ url: url.href, type: "text/plain", body: "User-agent: *\nAllow: /\n" });
+    }
+    if (url.pathname === "/.well-known/security.txt") {
+      return response({
+        url: url.href,
+        type: "text/plain",
+        body: [
+          "Contact: mailto:contact@correlius.org",
+          "Expires: 2027-08-01T00:00:00Z",
+          "Preferred-Languages: en",
+          "Canonical: https://correlius.org/.well-known/security.txt",
+          "",
+        ].join("\n"),
+      });
     }
     if (url.pathname === "/api/partner-access") {
       const result = response({ url: url.href, status: 405, body: "method not allowed" });

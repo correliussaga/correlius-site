@@ -1,0 +1,4 @@
+Contact: mailto:contact@correlius.org
+Expires: 2027-08-01T00:00:00Z
+Preferred-Languages: en
+Canonical: https://correlius.org/.well-known/security.txt

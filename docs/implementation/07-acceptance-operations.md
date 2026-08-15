@@ -24,7 +24,7 @@ The architecture-level amendments in AAD-06, AAD-07, and AAD-10 remain governing
 
 - `finalLegalCopyApproved`, `publicDiscoveryEnabled`, and `partnerRequestEnabled` remain false.
 - No public episode is released and no Stream customer code, social image, or Fractured Atlas URL is configured.
-- No monitored address is invented, so `/.well-known/security.txt` is not published yet.
+- Brian approved `contact@correlius.org` as the monitored security-only public alias on 2026-08-15. Its verified private forwarding destination remains in Cloudflare configuration rather than public source. `/.well-known/security.txt` is published with automated field, canonical-URL, content-type, and expiry validation; delivery and triage rehearsal remain an owner launch gate.
 - The smoke workflow uses `https://correlius.org` by default and runs in prelaunch mode until a released episode URL is configured.
 - No Cloudflare, GitHub, registrar, email, or legal-system action was performed.
 - No protected partner page, file, allowlist, identity, or Access credential entered this repository.
