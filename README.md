@@ -4,7 +4,7 @@ This repository contains the public Correlius.org site. The approved architectur
 
 ## Current implementation stage
 
-Stage 3 establishes the Astro static-build foundation and repository checks. The existing root-level HTML/CSS site remains unchanged and is not yet migrated into Astro. The Astro verification page is deliberately marked `noindex` and is not approved for deployment.
+Stage 4 implements the safe Astro public shell: Home, Watch, About, Support, For Partners, Privacy, and a custom 404 page. All Astro pages remain `noindex`, use honest unfinished states, and are not approved for production deployment. The existing root-level HTML/CSS site remains unchanged as the pre-Astro public surface until an authorized deployment cutover.
 
 ## Local development
 

@@ -1,0 +1,10 @@
+---
+const { title } = Astro.props;
+---
+
+<aside class="notice" aria-labelledby={`notice-${title.toLowerCase().replaceAll(" ", "-")}`}>
+  <h2 id={`notice-${title.toLowerCase().replaceAll(" ", "-")}`}>{title}</h2>
+  <div class="notice-content">
+    <slot />
+  </div>
+</aside>

@@ -1,21 +1,43 @@
 ---
-const title = "Correlius — Public Site Foundation";
-const description = "Private build verification page for the Correlius public-site foundation.";
+import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>Correlius public-site foundation</h1>
-      <p>This verification page is not approved for deployment.</p>
-    </main>
-  </body>
-</html>
+<BaseLayout
+  title="Correlius — An Independent Fan-Film Project"
+  description="Discover Correlius, an independent nonprofit fan-film project centered on character, healing, family, and unconventional strength."
+>
+  <section class="hero">
+    <div class="shell hero-inner">
+      <p class="eyebrow">Independent nonprofit fan-film project</p>
+      <h1>A different kind of hero’s journey.</h1>
+      <p class="hero-copy">
+        Correlius explores character, healing, family, and unconventional strength through
+        a story shaped by the language of science fiction.
+      </p>
+      <div class="button-row">
+        <a class="button button-primary" href="/watch/">Explore the films</a>
+        <a class="button button-secondary" href="/about/">About the project</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-paper" aria-labelledby="current-status-heading">
+    <div class="shell section-grid">
+      <div>
+        <p class="eyebrow">Public site preview</p>
+        <h2 id="current-status-heading">The next chapter is being prepared.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          The film catalog and full project story are being prepared for this new site.
+          Nothing here requires an account, and unfinished material is never presented as
+          released.
+        </p>
+        <p>
+          You can explore the public sections now, then return as approved films and project
+          information are added.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

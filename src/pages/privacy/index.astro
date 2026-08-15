@@ -1,0 +1,47 @@
+---
+import Notice from "../../components/Notice.astro";
+import PageIntro from "../../components/PageIntro.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Privacy — Correlius"
+  description="Preview privacy status for the Correlius public-site implementation."
+>
+  <PageIntro
+    eyebrow="Privacy"
+    title="Collect less. Explain what remains."
+    lead="The Correlius privacy design minimizes personal information and keeps public measurement separate from partner access."
+  />
+
+  <section class="section section-paper">
+    <div class="shell section-grid">
+      <div>
+        <p class="eyebrow">Current preview</p>
+        <h2>No request form or analytics is active.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          This static preview does not submit personal information, grant partner access,
+          load advertising trackers, or connect public visits to protected partner activity.
+        </p>
+        <p>
+          Before the request form is enabled, the final notice will identify the fields,
+          purpose, providers, retention behavior, and monitored privacy contact that apply.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell content-stack">
+      <Notice title="Policy approval still required">
+        <p>
+          This page describes the implementation preview and is not the final privacy
+          policy. An effective date and owner-approved contact must be present before any
+          personal-data form is released.
+        </p>
+      </Notice>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,53 @@
+---
+import Notice from "../../components/Notice.astro";
+import PageIntro from "../../components/PageIntro.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="For Partners — Correlius"
+  description="Learn who the Correlius professional partner process is for and how access requests will work."
+>
+  <PageIntro
+    eyebrow="For Partners"
+    title="A considered path for professional collaboration."
+    lead="The future request process is intended for people evaluating a feature, screening, discussion, collaboration, or project support."
+  />
+
+  <section class="section section-paper" aria-labelledby="partner-audiences-heading">
+    <div class="shell content-stack">
+      <div class="section-heading">
+        <p class="eyebrow">Intended audiences</p>
+        <h2 id="partner-audiences-heading">Useful context, shared deliberately.</h2>
+        <p>
+          Requests may come from podcasters, community moderators, convention organizers,
+          journalists, clinicians, prospective collaborators, and donors. Every request is
+          reviewed manually; submitting one never grants access automatically.
+        </p>
+      </div>
+
+      <ul class="card-grid" role="list">
+        <li class="info-card">
+          <h3>Editorial</h3>
+          <p>Interviews, articles, podcasts, or moderated discussions.</p>
+        </li>
+        <li class="info-card">
+          <h3>Community</h3>
+          <p>Screenings, convention programming, forums, or educational conversation.</p>
+        </li>
+        <li class="info-card">
+          <h3>Project support</h3>
+          <p>Professional collaboration or a reviewed prospective-donor conversation.</p>
+        </li>
+      </ul>
+
+      <Notice title="Requests are not open yet">
+        <p>
+          The public request form, privacy notice, abuse controls, notification route, and
+          protected sign-in destination must all pass their later implementation gates.
+          No personal information is collected by this preview.
+        </p>
+      </Notice>
+    </div>
+  </section>
+</BaseLayout>

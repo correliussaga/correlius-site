@@ -1,0 +1,49 @@
+---
+import Notice from "../../components/Notice.astro";
+import PageIntro from "../../components/PageIntro.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="About — Correlius"
+  description="An introduction to the purpose and themes of the independent Correlius fan-film project."
+>
+  <PageIntro
+    eyebrow="About"
+    title="Story after the heroic moment."
+    lead="Correlius uses science-fiction storytelling to make room for character, family, healing, and forms of strength that are easy to overlook."
+  />
+
+  <section class="section section-paper">
+    <div class="shell section-grid">
+      <div>
+        <p class="eyebrow">Project purpose</p>
+        <h2>More than winning the fight.</h2>
+      </div>
+      <div class="prose">
+        <p>
+          The project is interested in what comes after survival: how a person remains
+          themselves, lives with what happened, and stays connected to the people around
+          them.
+        </p>
+        <p>
+          Its perspective is Black-centered without treating any audience as unwelcome.
+          The films are creative works, not clinical guidance or promises about healing.
+        </p>
+        <p><a class="text-link" href="/watch/">Explore the film catalog <span aria-hidden="true">→</span></a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="shell content-stack">
+      <Notice title="Biography and history pending review">
+        <p>
+          The creator biography, project chronology, photographs, credits, and final
+          legal-language references will be added only after their source material is
+          approved.
+        </p>
+      </Notice>
+    </div>
+  </section>
+</BaseLayout>
