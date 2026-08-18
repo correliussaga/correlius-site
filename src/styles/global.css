@@ -118,7 +118,7 @@ a {
 }
 
 .eyebrow {
-  margin: 0 0 1.1rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold);
+  margin: 0 0 1.1rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; color: var(--paper-muted);
 }
 
 h1,
