@@ -1,0 +1,43 @@
+id: healed-but-not-cured
+slug: healed-but-not-cured
+sequence: 1
+title: "Healed But Not Cured"
+shortSynopsis: "A Correlius Journal short film exploring recovery, resilience, and the complexity of healing."
+synopsis: "Healed But Not Cured is the first Correlius Journal short film, presenting an intimate look at the journey of healing through the lens of neurodivergent experience. This film examines what it means to move forward while acknowledging that some parts of ourselves may never be 'fixed'—and why that's okay."
+runtimeSeconds: 402
+releaseDate: "2026-08-17"
+status: released
+streamUid: 66e156d97a9e4c5d3116de6a9b2b332a
+captions:
+  - language: en
+    label: English
+    kind: captions
+    streamTrackId: null
+    status: ready
+thumbnail:
+  src: /images/poster-healed-but-not-cured.png
+  alt: "Healed But Not Cured - Correlius Journal"
+  width: 1920
+  height: 1080
+poster:
+  src: /images/poster-healed-but-not-cured.png
+  alt: "Healed But Not Cured - Correlius Journal"
+  width: 1920
+  height: 1080
+socialImage:
+  src: /images/social-healed-but-not-cured.png
+  alt: "Healed But Not Cured - Correlius Journal"
+  width: 1200
+  height: 630
+contentContext: null
+credits:
+  - role: Creator
+    name: Correlius Studios
+    note: null
+featured: true
+contentApproved: true
+rightsReviewed: true
+creditsReviewed: true
+seo:
+  title: "Healed But Not Cured | Correlius Journal"
+  description: "Watch the first Correlius Journal short film exploring healing, neurodivergence, and resilience."

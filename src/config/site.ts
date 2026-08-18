@@ -1,5 +1,5 @@
 export const siteConfiguration = {
-  streamCustomerCode: null,
+  streamCustomerCode: "noq6r039htdsk0j5",
   fracturedAtlasUrl: null,
   finalLegalCopyApproved: false,
   publicDiscoveryEnabled: false,
