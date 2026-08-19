@@ -2,7 +2,7 @@ id: healed-but-not-cured
 slug: healed-but-not-cured
 sequence: 1
 title: "Healed But Not Cured"
-shortSynopsis: "A Correlius Journal short film exploring recovery, resilience, and the complexity of healing."
+shortSynopsis: "Jedi Master Thad Correlius travels to Atollon seeking guidance from the Bendu after a Padawan’s criticism reopens old wounds and self-doubt. Through grounding, reflection, and a little humor from Sara back home, Thad is reminded that healing does not require becoming someone else, and that progress can coexist with struggle."
 synopsis: "Healed But Not Cured is the first Correlius Journal short film, presenting an intimate look at the journey of healing through the lens of neurodivergent experience. This film examines what it means to move forward while acknowledging that some parts of ourselves may never be 'fixed'—and why that's okay."
 runtimeSeconds: 402
 releaseDate: "2026-08-17"
@@ -15,10 +15,10 @@ captions:
     streamTrackId: null
     status: ready
 thumbnail:
-  src: /images/poster-healed-but-not-cured.png
+  src: /images/hbnc-icon.png
   alt: "Healed But Not Cured - Correlius Journal"
-  width: 1920
-  height: 1080
+  width: 1351
+  height: 861
 poster:
   src: /images/poster-healed-but-not-cured.png
   alt: "Healed But Not Cured - Correlius Journal"

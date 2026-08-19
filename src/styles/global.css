@@ -244,13 +244,12 @@ h2 {
   overflow: hidden; height: 100%; border: 1px solid #d5cfc3; border-radius: var(--radius); color: var(--ink-950); background: var(--white); box-shadow: 0 1rem 3rem rgb(20 25 35 / 10%);
 }
 
-.episode-visual,
-.episode-thumbnail {
+.episode-visual {
   display: block; width: 100%; aspect-ratio: 16 / 9;
 }
 
 .episode-thumbnail {
-  object-fit: cover;
+  display: block; width: 100%; height: auto;
 }
 
 .episode-visual {
