@@ -15,10 +15,10 @@ captions:
     streamTrackId: null
     status: ready
 thumbnail:
-  src: /images/poster-the-saber-and-the-purpose.png
+  src: /images/tsatp-icon.png
   alt: "The Saber And the Purpose - Correlius Journal"
-  width: 1920
-  height: 1080
+  width: 1530
+  height: 859
 poster:
   src: /images/poster-the-saber-and-the-purpose.png
   alt: "The Saber And the Purpose - Correlius Journal"
