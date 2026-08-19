@@ -40,7 +40,7 @@ export const episodeSchema = z
     slug: z.string().regex(safeSlug),
     sequence: z.number().int().positive(),
     title: z.string().min(1).max(120),
-    shortSynopsis: z.string().min(1).max(240),
+    shortSynopsis: z.string().min(1).max(500),
     synopsis: z.string().min(1).max(2_500),
     runtimeSeconds: z.number().int().positive().nullable(),
     releaseDate: z.string().regex(isoDate).nullable(),
