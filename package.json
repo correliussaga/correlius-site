@@ -14,10 +14,11 @@
     "dev": "astro dev",
     "preview": "astro preview",
     "generate:manifest": "node scripts/generate-build-manifest.mjs",
-    "test": "npm run test:scanner && npm run test:content && npm run test:partner-boundary && npm run test:partner-request && npm run test:smoke && npm run audit:launch && npm run build",
+    "test": "npm run test:scanner && npm run test:content && npm run test:partner-boundary && npm run test:partner-portal && npm run test:partner-origin && npm run test:smoke && npm run audit:launch && npm run build",
     "test:content": "node scripts/verify-content.mjs",
     "test:partner-boundary": "node scripts/verify-partner-boundary.mjs",
-    "test:partner-request": "node scripts/verify-partner-request.mjs",
+    "test:partner-portal": "node scripts/verify-partner-portal.mjs",
+    "test:partner-origin": "node scripts/verify-partner-origin.mjs",
     "test:smoke": "node scripts/smoke-public.mjs --self-test",
     "verify:launch": "node scripts/verify-launch-readiness.mjs --require-ready",
     "test:scanner": "node scripts/verify-build.mjs --self-test",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "wrangler": "4.124.0"
   }
 }

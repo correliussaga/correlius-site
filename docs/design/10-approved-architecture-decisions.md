@@ -21,7 +21,7 @@ Brian's approval of Stage 2 authorizes implementation against the decisions belo
 | AAD-05 | Use Cloudflare Access email one-time PIN as the sole partner identity method for the MVP. | Access sessions last eight hours. Logout is explicit. Urgent revocation removes the email from policy and revokes the user's active tokens. The portal remains below the Access Free-plan limit of 50 active users. |
 | AAD-06 | Accept Cloudflare's provider-managed OTP abuse protections for the MVP. | US-09 and US-25 are interpreted as requiring the provider's single-use, short-lived PIN controls, generic response, anti-abuse behavior, and available authentication evidence—not a Correlius-configurable per-email failed-PIN threshold. A custom identity system is not added. |
 | AAD-07 | Accept the Cloudflare Access Free-plan 24-hour authentication-log window. | US-24 is interpreted as requiring reviewable logs for the provider's available retention period. Paid Access log retention and a separate PII log archive are excluded. |
-| AAD-08 | Implement partner requests with a narrow Cloudflare Worker/Pages Function route, Turnstile, a 24-hour keyed email-digest marker in KV, and Cloudflare Email Service to Brian's verified address. | The form validates input server-side, grants no access automatically, stores no application record, and returns an accessible on-page receipt. No applicant confirmation email is required. The rare simultaneous-request race in KV duplicate detection is accepted. |
+| AAD-08 | **Superseded 2026-08-19.** Do not accept partner applications online; Brian vets and approves partners privately. | Remove the form, Turnstile, KV, rate limiter, email notification, and request analytics. The public page links only to the protected portal root, and the retired endpoint returns HTTP 410. See decision 12. |
 | AAD-09 | Use native, privacy-conscious aggregate measurement only. | Use Cloudflare edge HTTP Traffic Analytics separated by hostname, Cloudflare Stream Analytics for playback, and a minimal Analytics Engine dataset for approved custom action events. Keep client-side Cloudflare Web Analytics and Network Error Logging disabled. Do not add third-party trackers, session replay, cross-surface identity joins, or research-data joins. |
 | AAD-10 | Use free Cloudflare incident/deployment notifications plus a scheduled GitHub Actions smoke check for availability evidence. | US-22 is interpreted to allow this free combined monitoring path. Paid Cloudflare Health Checks and third-party APM are excluded. Monitoring failure never creates a local payment, playback, or authentication fallback. |
 | AAD-11 | Use WCAG 2.2 Level AA as the implementation and test baseline. | Semantic static pages, keyboard operation, captions, reduced motion, responsive reflow, contrast, accessible errors, and the explicit US-06 acceptance criteria are release gates. |
@@ -40,15 +40,15 @@ The following dispositions close the conflicts reported in the traceability matr
 1. **US-09 and US-25 — OTP rate limiting.** “Rate-limited against a single email” is satisfied for the MVP by Cloudflare Access's provider-managed OTP and abuse protections together with available authentication logs. Correlius will not claim that a customer-configurable per-email threshold exists, and launch verification will record the provider behavior actually observed.
 2. **US-22 — availability alerting.** “Cloudflare-native” is amended to permit Cloudflare Incident/Pages notifications plus a scheduled GitHub Actions smoke check. The GitHub check may test the public site and released playback path without introducing a third-party monitoring vendor.
 3. **US-24 — log retention and protected branches.** The available 24-hour Access log window is accepted. GitHub Pro for protected branches in the private partner repository is within the approved near-free cost categories.
-4. **US-08 — applicant confirmation.** A durable, accessible on-page success receipt satisfies applicant confirmation. Email Service sends the request only to Brian's verified destination; it does not email the applicant.
-5. **Duplicate requests.** A 24-hour keyed digest in KV is sufficient abuse-control state. The known rare race between simultaneous requests is accepted and does not justify a database or stronger state service.
+4. **US-08 — vetted-only access.** The former applicant-confirmation requirement is superseded. There is no public application, applicant receipt, request email, or request state. Brian vets partners privately and separately administers exact approved emails in Cloudflare Access.
+5. **Closed application surface.** The retired request endpoint returns HTTP 410 without reading request bodies or provider bindings. No duplicate-request state is needed because no requests are accepted.
 
 ## Inputs still required during implementation
 
 The architecture is approved even though the following operational and content values must be supplied or confirmed before their dependent work packages can be completed:
 
 - Repository ownership and final repository/project names for the private partner site.
-- Monitored security, privacy, partner-request, contact, and sending addresses.
+- Monitored security, privacy, and protected-portal contact addresses.
 - Production Fractured Atlas URL, canonical `www` behavior, and required Cloudflare account/zone identifiers.
 - Approved project, creator, episode, image, caption, credit, disclaimer, privacy, evidence, media-kit, donor, and partner-help content.
 - Private storage and backup locations for masters, raw research, identity mappings, and the legal/IP response plan, plus emergency removal authority.
@@ -58,7 +58,7 @@ These are implementation inputs, not permission to weaken the approved boundarie
 
 ## Post-approval trust amendment — 2026-08-15
 
-Brian authorized the complete public trust-hardening recommendation after reviewing the production site from a visitor's perspective. AAD-09 is amended to prefer server/edge-side aggregate traffic measurement over a browser analytics beacon and to disable Cloudflare Network Error Logging. Stream and Turnstile are loaded only after the visitor chooses playback or submits the request form. This amendment narrows browser-side data transfer and does not expand scope, cost, identity collection, or analytics joins.
+Brian authorized the complete public trust-hardening recommendation after reviewing the production site from a visitor's perspective. AAD-09 is amended to prefer server/edge-side aggregate traffic measurement over a browser analytics beacon and to disable Cloudflare Network Error Logging. Stream is loaded only after the visitor chooses playback. The 2026-08-19 vetted-only decision removes Turnstile and the request form entirely.
 
 ## Stage 2 completion gate
 

@@ -28,7 +28,6 @@ const siteConfiguration = await readFile(`${repositoryRoot}/src/config/site.ts`,
 const releaseConfigurationIsClosed = [
   /finalLegalCopyApproved:\s*false/u,
   /publicDiscoveryEnabled:\s*false/u,
-  /partnerRequestEnabled:\s*false/u,
 ].every((pattern) => pattern.test(siteConfiguration));
 
 const blocked = evidence.criteria.filter(({ status }) => status !== "passed");

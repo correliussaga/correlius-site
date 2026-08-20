@@ -34,16 +34,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           not use ordinary public-visit data to identify or profile visitors.
         </p>
         <p>
-          Before the request form is enabled, the final notice will identify the fields,
-          purpose, providers, retention behavior, and monitored privacy contact that apply.
+          Correlius does not provide a public partner application form and does not collect
+          prospective-partner application data through this website. Partner access is offered
+          only after private vetting and approval.
         </p>
-        <h3>Planned request handling</h3>
+        <h3>Partner portal</h3>
         <ul>
-          <li>Name, email, affiliation, collaboration type, and a short message are emailed only to Brian’s verified destination for manual review.</li>
-          <li>A keyed digest of the normalized email—not the address itself—is kept in Cloudflare KV for 24 hours to suppress recent duplicates.</li>
-          <li>Cloudflare Turnstile loads only when submission is attempted, verifies the request, and aggregate outcomes contain no applicant identity or message.</li>
-          <li>The applicant receives an on-page receipt after accepted delivery; no applicant confirmation email is sent.</li>
-          <li>The request cannot create an account, change the approved-email list, or grant access.</li>
+          <li>The partner portal is hosted separately at partners.correlius.org and protected by Cloudflare Access.</li>
+          <li>Approved email addresses are administered privately and are not stored in the public website repository.</li>
+          <li>Visiting the sign-in page does not request access, create an account, or add an email address to the approved list.</li>
+          <li>Cloudflare processes the authentication and security information needed to protect the portal.</li>
         </ul>
       </div>
     </div>
@@ -54,8 +54,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       <Notice title="Policy approval still required">
         <p>
           This page describes the implementation preview and is not the final privacy
-          policy. An effective date and owner-approved contact must be present before any
-          personal-data form is released.
+          policy. An effective date and owner-approved privacy contact are still required
+          before launch.
         </p>
       </Notice>
     </div>

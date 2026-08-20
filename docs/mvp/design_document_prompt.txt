@@ -225,27 +225,25 @@ PUBLIC EPISODE PAGE
 Do not store large master video files in GitHub.
 
 ============================================================
-PARTNER ACCESS REQUEST
+VETTED PARTNER PORTAL
 ============================================================
 
-US-08 requires a public partner-access request process.
+US-08 is amended: Correlius does not accept partner applications
+online. Brian vets and approves partners privately.
 
-Design the smallest secure mechanism capable of:
+Design the public partner page and protected portal so that:
 
-- collecting the required fields
-- privacy notice
-- spam protection
-- rate limiting
-- duplicate-submission detection
-- notifying Brian by email
-- confirming submission to the applicant
-- manual approval
-- NOT automatically granting Cloudflare Access
+- the public page explains that access is by private approval only
+- the public page links only to https://partners.correlius.org/
+- no public application or registration form exists
+- no prospective-partner submission endpoint, Turnstile flow,
+  application database, KV marker, or notification email exists
+- visiting or attempting to sign in does not request access
+- only exact email addresses Brian approved privately can match the
+  Cloudflare Access Allow policy
+- Cloudflare Access remains deny by default for all portal resources
 
-Do not introduce a database merely because forms exist.
-
-If multiple reasonable Cloudflare-native approaches exist, compare
-them briefly and recommend one.
+Do not introduce an online application path or automated approval.
 
 Explicitly identify any requirement that cannot be satisfied cleanly
 without some state/storage and propose the smallest acceptable state

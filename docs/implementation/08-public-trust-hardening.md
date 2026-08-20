@@ -1,14 +1,15 @@
 # Public Trust Hardening
 
+> **Amended on 2026-08-19.** Decision 12 permanently removes the former public application surface; current CSP and deployment configuration contain no Turnstile dependency.
+
 ## Scope
 
-This package implements Brian's 2026-08-15 approval to favor strong public-site security with minimal browser-side observation. It updates the deployed public shell and its operating model; it does not enable public discovery, the partner-request form, or unpublished films.
+This package implements Brian's 2026-08-15 approval to favor strong public-site security with minimal browser-side observation. It updates the deployed public shell and its operating model; it does not enable public discovery or unpublished films.
 
 ## Repository controls
 
-- The content security policy is enforced, not report-only, and allows only the first-party site plus the exact Cloudflare Stream and Turnstile capabilities the application requires.
+- The content security policy is enforced, not report-only, and allows only the first-party site plus the exact Cloudflare Stream capability the application requires.
 - Cloudflare Stream is click-to-load. No Stream iframe or request is created until a visitor chooses **Load video player**, and playback never autostarts.
-- Turnstile is submit-time-only. Its script and widget are created only after a visitor submits an enabled partner-request form; the widget uses explicit execution and appears only if interaction is required.
 - Privacy copy distinguishes ordinary Cloudflare edge/security processing from advertising tracking, client-side audience analytics, session replay, and visitor profiling, which Correlius does not use.
 - The hourly smoke check rejects report-only CSP, Cloudflare browser analytics beacons, and Network Error Logging headers. It checks prelaunch privacy/discovery posture by default and automatically expands to released-episode playback checks when an episode URL is configured.
 - The approved monitored address is published through an RFC 9116 `/.well-known/security.txt` with a future expiry, canonical HTTPS URL, English preference, and automated production validation.
@@ -21,7 +22,6 @@ This package implements Brian's 2026-08-15 approval to favor strong public-site 
 - Use SSL/TLS **Full (strict)** and immediately verify the production origin remains healthy.
 - Retain Always Use HTTPS, minimum TLS 1.2, TLS 1.3, HSTS, Browser Integrity Check, managed WAF/DDoS protection, registrar lock, and domain auto-renew.
 - Keep Bot Fight Mode off unless measured abuse justifies its additional false-positive and browser-friction risk.
-- Keep Turnstile pre-clearance off when the production widget is created.
 - Keep DNSSEC under observation while Cloudflare Registrar completes automatic DS publication; do not manually disturb a pending enrollment.
 
 ## Remaining owner gates

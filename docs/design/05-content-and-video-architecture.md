@@ -146,7 +146,7 @@ A record cannot be `released` unless it has a Stream UID, synchronized English c
 
 | Field | Rule |
 |---|---|
-| `id` | Stable enum such as `watch`, `support`, `partner-request` |
+| `id` | Stable enum such as `watch`, `support`, `partner-sign-in` |
 | `label` | Human-readable action |
 | `href` | Internal route or allowlisted HTTPS external URL |
 | `external` | Boolean derived from host |

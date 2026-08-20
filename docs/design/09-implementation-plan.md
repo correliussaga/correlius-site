@@ -2,7 +2,7 @@
 
 ## Plan principles
 
-Work is divided into small packages that a coding agent can implement and verify one at a time after Brian approves this design. The order establishes a safe public vertical slice early, then adds content/video/accessibility/discovery, the request path, protected partner capability, measurement, hardening, operations, and final acceptance.
+Work is divided into small packages that a coding agent can implement and verify one at a time after Brian approves this design. The order establishes a safe public vertical slice early, then adds content/video/accessibility/discovery, the vetted-only partner handoff, protected partner capability, measurement, hardening, operations, and final acceptance.
 
 No package in this document is executed during the design phase.
 
@@ -15,7 +15,7 @@ flowchart LR
   W2 --> W4[WP-04 Video]
   W2 --> W5[WP-05 Accessibility]
   W3 --> W6[WP-06 SEO/support/legal]
-  W2 --> W7[WP-07 Partner request]
+  W2 --> W7[WP-07 Close public applications]
   W1 --> W8[WP-08 Partner platform/Access]
   W8 --> W9[WP-09 Evidence]
   W8 --> W10[WP-10 Media/donor/contact]
@@ -33,7 +33,7 @@ flowchart LR
   W14 --> W15
 ```
 
-WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may proceed in parallel after their dependencies. WP-09 and WP-10 may proceed in parallel once the protected portal is proven. WP-11 can begin after route/event names stabilize. WP-12 is cross-cutting and can audit earlier work incrementally but must finish after the form and Access configuration exist. WP-15 is sequential and last.
+WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may proceed in parallel after their dependencies. WP-09 and WP-10 may proceed in parallel once the protected portal is proven. WP-11 can begin after route/event names stabilize. WP-12 is cross-cutting and can audit earlier work incrementally but must finish after the closed application surface and Access configuration exist. WP-15 is sequential and last.
 
 ## WP-01 — Source, governance, and build foundation
 
@@ -155,25 +155,25 @@ WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may
 
 **DEFINITION OF DONE.** Every public page has accurate metadata, both sites have correct discovery posture, donations remain fully external, and approved disclaimer/credits are globally reachable.
 
-## WP-07 — Public partner-access request
+## WP-07 — Vetted-only partner handoff
 
 **ID.** WP-07  
-**TITLE.** Build the minimum secure, manually reviewed request path  
-**OBJECTIVE.** Collect only required fields, suppress/flag recent duplicates, notify Brian, confirm applicants, and never grant Access.
+**TITLE.** Remove online applications and expose only the secure portal handoff
+**OBJECTIVE.** Make private vetting the only approval path, link already-approved partners to the portal root, and ensure stale application clients cannot submit data.
 
-**REQUIREMENTS SATISFIED.** US-08, US-18, US-19, US-25, US-28; Success 3.
+**REQUIREMENTS SATISFIED.** Amended US-08, US-18, US-19, US-25; Success 3.
 
-**DEPENDENCIES.** WP-02; Brian's verified Email Service destination, monitored address, privacy/retention text, acceptance of on-page applicant confirmation, and KV residual risk. No Workers Paid plan is authorized.
+**DEPENDENCIES.** WP-02 and Brian's governing decision that partner vetting occurs privately.
 
-**FILES/AREAS EXPECTED TO CHANGE.** For Partners form/result pages; Worker; Turnstile/KV/Email/Analytics bindings; privacy page; endpoint/security tests; DNS email records.
+**FILES/AREAS EXPECTED TO CHANGE.** For Partners page; privacy page; retired endpoint; CSP; boundary/build/smoke tests; obsolete form, client, contract, binding, and request-analytics code.
 
-**IMPLEMENTATION TASKS.** Implement strict request contract; progressive HTML response; server-side Turnstile; WAF/Worker rate limit; HMAC normalized-email KV marker/24h TTL; safe notification to Brian's verified address; server-rendered applicant receipt after accepted delivery; aggregate outcomes; log redaction; SPF/DKIM/DMARC sending setup; manual-review copy. Do not bind Access administration credentials.
+**IMPLEMENTATION TASKS.** Remove the application form and client script; remove Turnstile, KV, rate-limit, email, and request-analytics dependencies; add invitation-only copy and the portal-root link; return HTTP 410 from the retired endpoint without reading a body or bindings; keep approved-email administration outside public source.
 
-**SECURITY CONSIDERATIONS.** Input/header injection, request/body limits, origin/CSRF, enumeration-neutral responses, no body logs/Git storage, secret bindings, mailbox retention/access. Fail honestly on provider error.
+**SECURITY CONSIDERATIONS.** Do not collect application data, reveal allowlist membership, embed Access administration credentials, or expose protected resource paths. The retired endpoint must remain non-cacheable and fail closed.
 
-**TEST/VERIFICATION.** Valid/invalid/malicious/oversized/replayed Turnstile; rate-limit; same-email duplicate within/after 24h; Brian email delivery and applicant on-page receipt; no Access change; log/analytics payload inspection; email authentication headers and accessibility.
+**TEST/VERIFICATION.** Scan the public build for forms, request scripts, Turnstile origins, application bindings, and protected paths; verify GET/POST return 410 without binding access; verify the public portal-root link and invitation-only copy; test approved and unapproved Access identities separately under WP-08.
 
-**DEFINITION OF DONE.** Production form meets every US-08 field/process condition, resists basic abuse, has disclosed data handling, emails Brian, confirms the applicant on-page, stays within Free tiers, and cannot grant partner access.
+**DEFINITION OF DONE.** No one can apply online, stale application clients cannot submit data, public pages collect no prospective-partner information, and only Brian's private vetting plus Cloudflare Access administration can establish portal eligibility.
 
 ## WP-08 — Partner Pages and Cloudflare Access boundary
 
@@ -327,7 +327,7 @@ WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may
 
 **FILES/AREAS EXPECTED TO CHANGE.** Test evidence/results; issue fixes through appropriate earlier packages; launch checklist/status in traceability/operations documentation.
 
-**IMPLEMENTATION TASKS.** Re-read the MVP; verify every story/criterion/exclusion; run cross-browser/device/accessibility and social preview tests; test public anonymity and partner denial/direct files; exercise form/email/duplicate/rates; inspect repositories/builds/logs for sensitive data; validate analytics vocabulary; test rollback/alerts/runbooks; obtain Brian approvals; launch and recheck production.
+**IMPLEMENTATION TASKS.** Re-read the MVP; verify every story/criterion/exclusion; run cross-browser/device/accessibility and social preview tests; test public anonymity, the closed application endpoint, and partner denial/direct files; inspect repositories/builds/logs for sensitive data; validate analytics vocabulary; test rollback/alerts/runbooks; obtain Brian approvals; launch and recheck production.
 
 **SECURITY CONSIDERATIONS.** No waiver is implicit. Any critical access, secret, privacy, TLS/header, account, cost, or content-rights failure blocks launch. A no-go criterion must be amended or supported by new provider evidence; merely accepting an unmet requirement is insufficient.
 
@@ -337,15 +337,15 @@ WP-03, WP-04, and WP-05 may proceed in parallel after WP-02. WP-07 and WP-08 may
 
 ## Parallelization and sequencing notes
 
-- **Can parallelize:** public copy/schema (WP-03), Stream setup (WP-04), and accessibility component work (WP-05); request Worker (WP-07) and partner platform (WP-08); evidence (WP-09) and media/donor resources (WP-10); private legal plan (WP-14) once contacts/authority are known.
-- **Must remain sequential:** repository/security foundation before production code; Access coverage before uploading real partner files; de-identification review before partner evidence deployment; email/domain setup before production form acceptance; core routes/actions before final analytics names; security hardening after all endpoints/hosts exist; final verification last.
+- **Can parallelize:** public copy/schema (WP-03), Stream setup (WP-04), and accessibility component work (WP-05); public application closure (WP-07) and partner platform (WP-08); evidence (WP-09) and media/donor resources (WP-10); private legal plan (WP-14) once contacts/authority are known.
+- **Must remain sequential:** repository/security foundation before production code; Access coverage before uploading real partner files; de-identification review before partner evidence deployment; core routes/actions before final analytics names; security hardening after all endpoints/hosts exist; final verification last.
 - **Cross-cutting:** accessibility and security are acceptance streams, not end-only polish. WP-05/WP-12 add final gates but feed fixes back into the package that owns each component.
 
 ## Final MVP launch checklist mapped to success criteria
 
 - [ ] **Success 1:** A first-time mobile tester explains Correlius and starts a film within two minutes.
 - [ ] **Success 2:** Both completed episodes play in incognito mode without account/email/payment; controls and captions work.
-- [ ] **Success 3:** A real test partner request collects only required fields, confirms the applicant, notifies Brian, and grants nothing.
+- [ ] **Success 3:** The public site offers no partner application; the retired endpoint returns 410; the sign-in handoff reveals no protected resources or allowlist status.
 - [ ] **Success 4:** Approved email receives/uses OTP; unapproved email receives no access; direct protected URL remains denied. OTP rate-limit disposition is recorded.
 - [ ] **Success 5:** Evidence states `n=11`, method/subgroups/limitations, balanced count-backed findings and traceable anonymous quotes, with no identifiers.
 - [ ] **Success 6:** A host downloads every required asset individually or in the labeled package; usage/rights/accessibility checks pass.
@@ -363,11 +363,10 @@ Implementation should not start until Brian decides:
 
 1. two repositories/projects and private partner repository;
 2. Astro static generation;
-3. on-page applicant confirmation and free Email Service notification only to Brian's verified destination;
-4. KV 24-hour digest deduplication and its rare concurrent race;
-5. 8-hour Access session, fewer than 50 active users, and acceptance/amendment of the 24-hour Free-plan log window;
-6. amendment of US-09/US-25 to provider-managed Access OTP abuse controls versus further Cloudflare confirmation;
-7. amendment of US-22 to free Cloudflare Incident/Pages alerts plus an hourly GitHub Actions smoke check;
-8. approximately $4/month GitHub Pro, domain renewal, and low-volume Stream usage as the complete near-free cost envelope;
-9. a numeric monthly/annual ceiling and Stream usage alert threshold;
-10. monitored contacts, private record storage/retention, emergency removal authority, and required production content/URLs.
+3. private vetting as the only approval path and exact-email administration only in Cloudflare Access;
+4. 8-hour Access session, fewer than 50 active users, and acceptance/amendment of the 24-hour Free-plan log window;
+5. amendment of US-09/US-25 to provider-managed Access OTP abuse controls versus further Cloudflare confirmation;
+6. amendment of US-22 to free Cloudflare Incident/Pages alerts plus an hourly GitHub Actions smoke check;
+7. approximately $4/month GitHub Pro, domain renewal, and low-volume Stream usage as the complete near-free cost envelope;
+8. a numeric monthly/annual ceiling and Stream usage alert threshold;
+9. monitored contacts, private record storage/retention, emergency removal authority, and required production content/URLs.

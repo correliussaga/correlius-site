@@ -17,7 +17,7 @@ Brian explicitly authorized publication of the current Astro build as a public p
 - The Pages production and preview provider hostnames remain protected by Cloudflare Access.
 - Search indexing remains disabled through `robots.txt`, page metadata, and provider preview controls.
 - No episode is represented as released or playable until its release schema and approval gates pass.
-- The partner-request form remains disabled until its privacy copy, bindings, delivery checks, and abuse controls pass.
+- Partner applications are not accepted online; the form and processing dependencies are removed under the 2026-08-19 vetted-only decision.
 - Placeholder, private, rights-restricted, or unapproved media and evidence remain excluded.
 - The formal 13-criterion production launch gate and later launch authorization remain unchanged.
 
@@ -27,4 +27,4 @@ Brian explicitly authorized publication of the current Astro build as a public p
 - The public custom domain is not placed behind Access; anonymous viewing is an approved public-site requirement.
 - Existing safe Cloudflare Pages deployments are retained as rollback targets.
 - Domain auto-renew is enabled at Brian's explicit direction on 2026-08-15; the registrar lock remains enabled.
-- Any later removal of `noindex`, activation of the request route, release of an episode, or claim that the MVP is launched must pass its existing approval and acceptance gates.
+- Any later removal of `noindex`, restoration of an online application path, release of an episode, or claim that the MVP is launched requires a new approved decision and must pass its applicable acceptance gates.

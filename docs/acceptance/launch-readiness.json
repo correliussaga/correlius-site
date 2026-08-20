@@ -1,6 +1,6 @@
 {
   "format": "correlius-launch-readiness-v1",
-  "asOf": "2026-08-15",
+  "asOf": "2026-08-19",
   "productionLaunchAuthorized": false,
   "criteria": [
     {
@@ -17,15 +17,15 @@
     },
     {
       "id": "success-03",
-      "status": "blocked",
-      "evidence": ["The request boundary and provider-failure test harness pass locally."],
-      "blocker": "The form remains disabled pending approved privacy copy, real Turnstile/KV/rate/email bindings, delivery evidence, and production abuse testing."
+      "status": "passed",
+      "evidence": ["The production public application UI and processing dependencies are removed; the retired endpoint returns non-cacheable HTTP 410 without reading request bodies or bindings."],
+      "blocker": null
     },
     {
       "id": "success-04",
       "status": "blocked",
-      "evidence": ["The exact-email, one-tier, eight-hour Access administration runbook is recorded."],
-      "blocker": "The private repository, partner Pages project, Access application, approved/unapproved OTP evidence, and direct-resource denial matrix do not exist."
+      "evidence": ["Production has an eight-hour Access application with OTP, one exact-email Allow rule, no broad selectors, disabled workers.dev/previews, and unauthenticated denial evidence for the portal root and guessed direct resources."],
+      "blocker": "Approved-user OTP completion, unapproved-address no-delivery/denial, session expiry, logout, and active-revocation rehearsals remain incomplete; the current origin is a content-free bootstrap Worker rather than the planned private portal repository."
     },
     {
       "id": "success-05",

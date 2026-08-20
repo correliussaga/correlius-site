@@ -4,14 +4,14 @@
 
 The partner evidence room is a controlled professional site for individually approved people. It helps a partner evaluate Correlius, use approved feature materials, understand exploratory evidence and donor needs, and contact Brian. It is not a registration portal, CRM, file-sharing platform, donor dashboard, or separate set of permission tiers. The MVP is capped below Cloudflare Access's 50-active-user Free-plan limit; exceeding that cap is a scope and cost review, not an automatic upgrade.
 
-Two distinct journeys must never be conflated:
+The public handoff and authenticated experience must never be conflated:
 
 | Journey | Host | Audience | Outcome |
 |---|---|---|---|
-| **Public partner-access request** | `correlius.org/for-partners/` | Any prospective partner | Sends a manually reviewed request; grants nothing |
+| **Public partner sign-in handoff** | `correlius.org/for-partners/` | Already-vetted partner | Explains invitation-only access and links to the portal root; collects nothing |
 | **Authenticated partner portal** | `partners.correlius.org/` | Exact approved email only | Access OTP session permits protected pages/downloads |
 
-The request Worker has no Cloudflare Access write credential and cannot auto-provision an applicant.
+Brian vets prospective partners privately and administers approved exact email addresses outside the public repository. No public request Worker or automated approval path exists.
 
 ## Security invariant
 
@@ -38,13 +38,13 @@ A visible Logout action points to `https://partners.correlius.org/cdn-cgi/access
 
 ## Authentication entry experience
 
-1. Visitor follows a neutral Partner sign-in link or enters the partner URL.
+1. An already-vetted partner follows the neutral Partner sign-in link or enters the partner URL.
 2. Access intercepts before Pages and presents its hosted email OTP form.
 3. The login page does not reveal whether an email is approved; approved addresses receive a single-use PIN and unapproved addresses see the same generic acknowledgement.
 4. After PIN and policy validation, Access returns the originally requested URL and issues an 8-hour application/policy token.
 5. The portal header identifies the private nature of the site and offers Logout.
 
-Portal content does not implement or restyle authentication. Cloudflare owns PIN generation, delivery, expiration, validation, and authorization cookies. The Access application name and help text explain that access is by prior approval and link to the public request process without exposing allowlist membership.
+Portal content does not implement or restyle authentication. Cloudflare owns PIN generation, delivery, expiration, validation, and authorization cookies. The Access application name and help text explain that access is by prior private approval without exposing allowlist membership or offering an application path.
 
 ## Partner Overview (`/`)
 
@@ -156,7 +156,7 @@ The partner host sends `X-Robots-Tag: noindex, nofollow, noarchive` for all resp
 - **Session lifetime:** 8 hours at the Access policy/application level; confirm in launch audit.
 - **Expiration:** next request re-enters the generic OTP flow; unsaved state is not expected because pages are read-only.
 - **Logout:** visible link to provider logout; landing page explains that reauthentication is needed.
-- **Access denied:** Cloudflare's generic result reveals neither allowlist status nor other partners; it links to the public request process/support contact.
+- **Access denied:** Cloudflare's generic result reveals neither allowlist status nor other partners and offers no application path.
 - **Revocation:** remove exact email from the Allow policy, revoke that user's active tokens, then verify with an incognito/direct-resource request. Removal alone blocks future policy evaluation but does not satisfy urgent active-session revocation.
 - **Logs:** authentication attempts are reviewed in restricted Access logs; page analytics remains aggregate. The Free plan retains Access logs for 24 hours. Brian must accept that window as sufficient and review after approvals/incidents, or US-24 is a no-go pending amendment; paid retention is excluded.
 

@@ -1,5 +1,4 @@
 ---
-import Notice from "../../components/Notice.astro";
 import PageIntro from "../../components/PageIntro.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getProject } from "../../lib/content";
@@ -21,7 +20,7 @@ const project = await getProject();
     <div class="shell section-grid">
       <div>
         <p class="eyebrow">Project purpose</p>
-        <h2>More than winning the fight.</h2>
+        <h2>A different lens on a familiar galaxy.</h2>
       </div>
       <div class="prose">
         {project.missionParagraphs.map((paragraph) => <p>{paragraph}</p>)}
@@ -34,14 +33,41 @@ const project = await getProject();
   </section>
 
   <section class="section">
-    <div class="shell content-stack">
-      <Notice title="Biography and history pending review">
+    <div class="shell section-grid">
+      <div>
+        <p class="eyebrow">About the Creator</p>
+        <img
+          class="creator-portrait"
+          src="/images/brian-payne.jpg"
+          alt="Portrait of Brian Payne"
+          width="958"
+          height="960"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="prose">
         <p>
-          The creator biography, project chronology, photographs, credits, and final
-          legal-language references will be added only after their source material is
-          approved.
+          Brian Payne is the creator of Correlius, a nonprofit Star Wars fan-story project
+          centered on Black lived experience, mental health, family, healing, and community.
+          A lifelong Star Wars fan, Brian brings more than 25 years of corporate experience,
+          including work in quality engineering and artificial intelligence.
         </p>
-      </Notice>
+        <p>
+          Outside of technology, Brian has a long background in music and performance,
+          spanning classical piano, jazz, R&amp;B, gospel and music production. His experience
+          includes performing at major cultural and international events, working with
+          national recording artists, and producing music that has received national radio
+          exposure.
+        </p>
+        <p>
+          Correlius brings those worlds together: technical problem-solving, performance,
+          music, and a lifelong love of science fiction. Brian created the project as an
+          independent, nonprofit storytelling effort designed to use familiar mythology in
+          new ways, particularly to explore Black male mental health and culturally resonant
+          stories for the Blerd community.
+        </p>
+      </div>
     </div>
   </section>
 </BaseLayout>

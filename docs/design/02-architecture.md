@@ -2,9 +2,9 @@
 
 ## Architecture style
 
-The MVP is a **static-first, edge-hosted, two-surface architecture**. Two independent static sites are built from GitHub and deployed to separate Cloudflare Pages projects. Cloudflare Access forms the front-door authorization boundary for every partner hostname and deployment URL. A single narrow Worker handles the only public write operation (partner-access request), and an equally narrow first-party event endpoint records the few actions Cloudflare's native page/video analytics do not measure.
+The MVP is a **static-first, edge-hosted, two-surface architecture**. Two independent static sites are built from GitHub and deployed to separate Cloudflare Pages projects. Cloudflare Access forms the front-door authorization boundary for every partner hostname and deployment URL. The public site has no partner-application write path; the former endpoint is a binding-free HTTP 410 response.
 
-This is not a single-page application, server-rendered application, microservice estate, or database-backed CMS. Pages are generated at build time. Client JavaScript is limited to visitor-initiated Stream and Turnstile loading, navigation behavior where unavoidable, and narrowly enumerated first-party aggregate event calls.
+This is not a single-page application, server-rendered application, microservice estate, or database-backed CMS. Pages are generated at build time. Client JavaScript is limited to visitor-initiated Stream loading, navigation behavior where unavoidable, and narrowly enumerated first-party aggregate event calls.
 
 ## Component inventory and MVP justification
 
@@ -16,10 +16,7 @@ This is not a single-page application, server-rendered application, microservice
 | Partner Pages project | Separate protected origin/build output | US-09, US-15, US-18 |
 | Cloudflare Access application(s) | Allowlisted email OTP, sessions, revocation, logs | US-09, US-15, US-24 |
 | Cloudflare Stream | Video storage/transcoding/player/captions/analytics | US-04–US-06, US-14, US-19 |
-| Partner-request Worker | Validates and delivers form submissions | US-08, US-18, US-25, US-28 |
-| Turnstile | Form spam control | US-08, US-25 |
-| KV duplicate marker | Flags normalized email for 24 hours | US-08; smallest state that meets duplicate detection |
-| Email Service | Notification to Brian's verified destination | US-08, US-28 |
+| Retired application endpoint | Rejects stale GET/POST clients with non-cacheable HTTP 410 and no bindings | Amended US-08; prevents accidental application acceptance |
 | Edge HTTP Traffic Analytics | Aggregate request/page-traffic measurement separated by hostname | US-19, US-22 |
 | Analytics Engine event dataset | First-party starts/clicks/submissions/contact events | US-19 action metrics unavailable from aggregate edge traffic |
 | GitHub repositories | Versioning, review, branch/dependency controls | US-14, US-16, US-24, US-26 |
@@ -45,10 +42,7 @@ flowchart TB
     PUB[Public Pages project]
     ACC[Access policy boundary]
     PART[Partner Pages project]
-    FW[Partner-request Worker]
-    TS[Turnstile validation]
-    KV[(KV: HMAC email marker, 24h TTL)]
-    ES[Email Service]
+    CLOSED[Retired endpoint: HTTP 410]
     ETA[Edge HTTP Traffic Analytics]
     AE[(Analytics Engine)]
     ST[Stream]
@@ -63,10 +57,7 @@ flowchart TB
   A --> ACC
   A --> ST
   PUB --> ST
-  PUB --> FW
-  FW --> TS
-  FW --> KV
-  FW --> ES
+  PUB -. no application path .-> CLOSED
   PUB --> ETA
   PART --> ETA
   PUB --> AE
@@ -143,56 +134,46 @@ sequenceDiagram
   end
 ```
 
-## Partner-access request flow
+## Vetted-only partner handoff
 
 ```mermaid
 sequenceDiagram
-  actor Applicant
-  participant Form as Public For Partners page
-  participant Worker as Request Worker
-  participant Turnstile
-  participant KV as KV marker
-  participant Email as Cloudflare Email Service
+  actor Partner as Privately vetted partner
+  participant Public as Public For Partners page
+  participant Access as Cloudflare Access
+  participant Portal as Protected partner portal
   actor Brian
 
-  Applicant->>Form: Enter minimum fields and accept privacy notice
-  Form->>Worker: POST /api/partner-access
-  Worker->>Worker: Enforce method, origin, size, types, lengths
-  Worker->>Turnstile: Server-side token validation
-  Turnstile-->>Worker: Valid or invalid
-  Worker->>KV: Read keyed email digest
-  alt recent marker exists
-    Worker-->>Applicant: Request already received - manual review pending
-  else first valid submission
-    Worker->>Email: Send structured notification to Brian
-    Email-->>Brian: Submission details
-    Worker->>KV: Store digest with 24-hour TTL
-    Worker-->>Applicant: Accessible on-page receipt - no access granted
+  Brian->>Access: Privately approve exact email
+  Partner->>Public: Read invitation-only access notice
+  Public-->>Partner: Link to partners.correlius.org root
+  Partner->>Access: Open portal and authenticate
+  alt exact email is approved
+    Access->>Portal: Forward authenticated request
+    Portal-->>Partner: Protected content
+  else email is not approved
+    Access-->>Partner: Generic denial
   end
 ```
 
-The Worker never calls the Access API and cannot grant access. It accepts only `name`, `email`, `affiliation`, `collaborationType`, `message`, and the Turnstile token. Values have conservative length limits and plain-text email encoding. No form body, raw IP, or applicant identity is written to GitHub, logs, KV, or analytics. Operational logs redact payloads.
+The public site does not collect applications or prospective-partner details. Brian's private vetting is the only path to exact-email Access administration. Visiting the public page or portal cannot create an application, account, or approved-email entry.
 
-### Form alternatives considered
+### Application alternatives considered
 
 | Option | Benefits | Problems | Decision |
 |---|---|---|---|
-| Static `mailto:` | No backend/cost | Cannot reliably validate, rate-limit, deduplicate, confirm, or notify | Reject |
-| Third-party form SaaS | Fast, often includes spam/email | New processor/vendor, unclear privacy/retention, duplicate semantics vary | Fallback only |
-| Pages Function/Worker + Turnstile + KV + Email Service to verified Brian address | Cloudflare-native, narrow state, precise validation, no database/dashboard, fits Free tiers | Applicant receipt is on-page rather than email | **Recommend** |
-| Worker + D1 | Strong queryable state | Creates application database and retention burden | Reject |
-| Durable Object/Queue workflow | Strong coordination/retry | More components/operations than MVP warrants | Reject unless delivery reliability proves insufficient |
+| Public form or `mailto:` | Lets unknown visitors initiate review | Conflicts with private-vetting requirement and creates personal-data handling | Reject |
+| Third-party application/CRM service | Adds workflow features | New processor, public intake, retention, and automation conflict with the requirement | Reject |
+| Static invitation-only handoff to Cloudflare Access | No application data or backend; clear trust boundary | Requires Brian to vet and coordinate privately | **Selected** |
 
-KV is eventually consistent, so two near-simultaneous requests processed in different locations could rarely both pass the first check. Rate limiting reduces that race. Exact global duplicate serialization would require stronger state, contradicting the no-database/low-complexity direction; this residual risk requires Brian's acceptance.
-
-The applicant confirmation requirement is satisfied by the server-rendered success receipt returned only after Brian's notification is accepted for delivery. Cloudflare permits free sending to verified destination addresses, so only Brian receives email. Arbitrary-recipient applicant email would require Workers Paid and is therefore out of scope under the hard cost ceiling.
+The retired `/api/partner-access` path returns HTTP 410 for every method, does not read request bodies or bindings, and is non-cacheable. It exists only to fail closed for stale clients.
 
 ## Cost architecture
 
-- **Free-tier services:** Pages, Workers/Pages Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine within published quotas, and Cloudflare Access for fewer than 50 active users.
+- **Free-tier services:** Pages, edge HTTP Traffic Analytics, plan-appropriate security controls, and Cloudflare Access for fewer than 50 active users.
 - **Near-free required costs:** existing domain renewal; Stream at $5 per 1,000 stored minutes prepaid plus $1 per 1,000 delivered minutes; GitHub Pro at approximately $4/month so the private partner repository can enforce branch protection.
 - **Spend controls:** no autoplay or video preload, Stream usage/billing alerts, free-tier request limits, no automatic plan upgrades, and a monthly cost review.
-- **Explicitly rejected paid features:** Cloudflare Pro Health Checks, Workers Paid just for applicant email, paid Access seats/30-day logs, Enterprise Logpush/Bot Management, and third-party monitoring/APM.
+- **Explicitly rejected paid features:** Cloudflare Pro Health Checks, paid Access seats/30-day logs, Enterprise Logpush/Bot Management, and third-party monitoring/APM.
 
 ## Content architecture
 
@@ -213,8 +194,7 @@ Measurement is intentionally separated by source and vocabulary:
 | Film starts | Stream analytics where definition matches; otherwise first-party `player_start` event | Stream/player event listener | Requires custom instrumentation to define “start” consistently |
 | Approximate viewing minutes | Stream Analytics dashboard/API | Native Stream server-side analytics | Approximate; verify available aggregation before launch |
 | Support-link selections | Analytics Engine | First-party click event before external navigation | Selection is not a donation |
-| Partner-access requests | Analytics Engine | Server records only successful/duplicate outcome, no identity | Request is not approval |
-| Authenticated partner visits | Edge HTTP Traffic Analytics filtered to the partner hostname + Access authentication logs | Edge metrics remain aggregate; Access proves authentication | Request analytics is aggregate; auth logs are identity-bearing and restricted |
+| Authenticated partner visits | Edge HTTP Traffic Analytics filtered to the partner hostname + Access authentication logs | Edge metrics remain aggregate; Access proves authentication | Auth logs are identity-bearing and restricted |
 | Collaboration-contact actions | Analytics Engine | First-party click/form action | Action is not a completed conversation/invitation |
 
 Client-side Cloudflare Web Analytics and Network Error Logging remain disabled, avoiding an analytics beacon or NEL reporting endpoint in visitors' browsers. Named action metrics require explicit first-party instrumentation. The event endpoint accepts only an enumerated event name, surface, route category, and timestamp bucket; it rejects free text and identifiers. Survey evidence stays in separate content/storage and is never joined to website analytics.
@@ -225,15 +205,14 @@ Client-side Cloudflare Web Analytics and Network Error Logging remain disabled, 
 2. **Static page:** browser → Cloudflare DNS/TLS/WAF/CDN → public Pages asset.
 3. **Protected page/download:** browser → Cloudflare edge → Access policy → partner Pages asset; denial returns no origin content.
 4. **Video:** public episode page → allowed-origin Stream iframe/manifests/segments → playback analytics.
-5. **Request:** form → Worker validation/Turnstile/rate limit → duplicate digest → two emails → aggregate outcome event.
+5. **Partner handoff:** public invitation-only page → portal root → Access exact-email policy → protected origin or generic denial.
 6. **Donation:** public/partner link → clearly external Fractured Atlas page; no payment callback or Correlius data store.
 
 ## Security and privacy controls
 
-- TLS-only; HSTS after HTTPS verification; CSP allowlist includes only required first-party and Stream/Turnstile sources.
+- TLS-only; HSTS after HTTPS verification; CSP allowlist includes only required first-party and Stream sources.
 - `nosniff`, frame restrictions, Referrer-Policy, Permissions-Policy, secure cookies managed by providers.
-- WAF managed rules/Bot Fight Mode where available; one zone rate-limit rule prioritizes form POSTs.
-- Turnstile tokens validated server-side and single-use.
+- WAF managed rules/Bot Fight Mode where available; the retired application endpoint accepts no submissions.
 - Exact Access email allowlist; generic login messages; 8-hour tokens; removal plus active-token revocation.
 - 2FA, branch protection, least-privilege integrations/tokens, dependency lockfile and automated advisories.
 - No secrets, private identifiers, raw research, or legal/insurance files in client output or public Git.
@@ -248,8 +227,7 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 | Bad content deploy succeeds | Page may be incorrect but site remains reachable | Roll back to prior known-good Pages deployment, then correct source |
 | Stream unavailable/player blocked | Poster and readable fallback remain; no blank rectangle | Check Stream status/config; alert; publish status note only if needed |
 | Access unavailable | Partner portal fails closed; public site unaffected | Check Cloudflare status/logs; do not bypass Access |
-| Email/Worker failure | Form shows retryable non-disclosing error; request is not claimed successful | Check Worker/Email logs; retry after remediation |
-| KV unavailable | Fail closed for submission rather than bypassing duplicate control | Alert/log sanitized error; retry later |
+| Retired application endpoint receives traffic | Non-cacheable HTTP 410; no data accepted | Check for stale links; do not restore application processing |
 | Analytics unavailable | User journey continues; events may be lost | Accept bounded data loss; analytics is noncritical |
 | Fractured Atlas unavailable | Explain external destination unavailable; no local payment fallback | Verify URL/provider; do not collect cards |
 | Compromised partner device | Access remains until token expiry unless revoked | Remove allowlist entry and revoke user tokens immediately |
@@ -258,7 +236,7 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 
 - **AD-01:** separate repositories and Pages projects for public and partner artifacts.
 - **AD-02:** Astro static output with schema-validated content and minimal hydration.
-- **AD-03:** standalone Worker route for partner requests, Turnstile, KV HMAC marker (24 hours), and Cloudflare Email Service.
+- **AD-03:** no public partner application path or state; private vetting plus exact-email Cloudflare Access approval only. The retired endpoint is a binding-free HTTP 410 response.
 - **AD-04:** no signed Stream URLs for public films; use allowed origins. This preserves anonymous playback and prevents casual off-domain embedding, not copying.
 - **AD-05:** eight-hour Access application/policy session; explicit logout; remove email and revoke current token for urgent revocation.
 - **AD-06:** edge HTTP traffic metrics separated by hostname plus a minimal Analytics Engine dataset for approved custom action events; no client-side Web Analytics or Network Error Logging.
@@ -278,13 +256,11 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 ## Open questions and constraints needing approval
 
 1. Cloudflare's hosted Access OTP UI does not expose a documented customer control for per-email failed-PIN rate limiting. Zone WAF rules cannot safely be claimed to govern Cloudflare's separate hosted authentication endpoints. Provider abuse protections, single-use 10-minute PINs, the `CF_Device` anti-abuse cookie, and authentication logs help, but US-09/US-25's exact “rate-limited against a single email” verification is **OPEN QUESTION**. Brian must accept provider-managed protection or approve a materially different identity solution.
-2. Confirm that the server-rendered success receipt satisfies applicant confirmation. The Free-tier design emails only Brian's verified destination and does not send applicant email.
-3. Confirm KV's rare concurrent-duplicate residual risk is acceptable; exact global deduplication requires stronger state.
-4. Confirm two repositories, Astro, an 8-hour Access session, GitHub Pro as a near-free cost, and acceptance or amendment of the Free-plan 24-hour Access-log window.
-5. Confirm whether the partner `*.pages.dev` production hostname should be Access-protected or redirected. Preview URLs must be Access-protected in either case.
-6. Supply actual content, media, email addresses, Fractured Atlas URL, and approved legal language before implementation.
-7. US-22's exact Cloudflare-native site/Stream unavailability alert is a cost no-go: standalone Health Checks require Pro or higher, and Cloudflare documents no on-demand Stream per-asset availability notification. The free replacement is Pages deployment notifications, Cloudflare Incident Alerts, and a scheduled GitHub Actions smoke check within included minutes. This requires a requirement amendment because the smoke check is GitHub-native, not Cloudflare-native.
-8. Define the numeric “near free” ceiling. Until then, the design treats domain renewal, approximately $4/month GitHub Pro, and low-volume Stream usage as the maximum approved categories, not an unlimited budget.
+2. Confirm two repositories, Astro, an 8-hour Access session, GitHub Pro as a near-free cost, and acceptance or amendment of the Free-plan 24-hour Access-log window.
+3. Confirm whether the partner `*.pages.dev` production hostname should be Access-protected or redirected. Preview URLs must be Access-protected in either case.
+4. Supply actual content, media, approved-partner contact details, Fractured Atlas URL, and approved legal language before implementation.
+5. US-22's exact Cloudflare-native site/Stream unavailability alert is a cost no-go: standalone Health Checks require Pro or higher, and Cloudflare documents no on-demand Stream per-asset availability notification. The free replacement is Pages deployment notifications, Cloudflare Incident Alerts, and a scheduled GitHub Actions smoke check within included minutes. This requires a requirement amendment because the smoke check is GitHub-native, not Cloudflare-native.
+6. Define the numeric “near free” ceiling. Until then, the design treats domain renewal, approximately $4/month GitHub Pro, and low-volume Stream usage as the maximum approved categories, not an unlimited budget.
 
 ## Official capability references
 
@@ -293,12 +269,9 @@ Full threat modeling and launch checks are in `06-security-and-access-control.md
 - [Cloudflare Access OTP behavior](https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/one-time-pin/)
 - [Cloudflare Access session management](https://developers.cloudflare.com/cloudflare-one/access-controls/access-settings/session-management/)
 - [Cloudflare Stream allowed origins](https://developers.cloudflare.com/stream/viewing-videos/securing-your-stream/)
-- [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)
-- [Cloudflare Email Service](https://developers.cloudflare.com/email-service/get-started/send-emails/)
 - [Cloudflare available notifications](https://developers.cloudflare.com/notifications/notification-available/)
 - [Cloudflare Health Check notifications](https://developers.cloudflare.com/health-checks/how-to/health-checks-notifications/)
 - [Cloudflare Stream pricing](https://developers.cloudflare.com/stream/pricing/)
-- [Cloudflare Email Service pricing](https://developers.cloudflare.com/email-service/platform/pricing/)
 - [Cloudflare Analytics Engine pricing](https://developers.cloudflare.com/analytics/analytics-engine/pricing/)
 - [Cloudflare Access Free-plan pricing](https://www.cloudflare.com/plans/zero-trust-services/)
 - [GitHub protected-branch plan availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)

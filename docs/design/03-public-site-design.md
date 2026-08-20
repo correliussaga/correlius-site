@@ -29,7 +29,7 @@ Episode detail pages are children of Watch and appear through episode cards, pre
 | `/watch/{slug}/` | Episode detail | One episode record | Released: yes; coming soon: conditional | US-04–US-06, US-20 |
 | `/about/` | About | Project, creator, history, mission | Yes | US-02, US-03, US-17, US-20 |
 | `/support/` | Support | Funding-purpose copy and Fractured Atlas URL | Yes | US-07, US-17, US-19 |
-| `/for-partners/` | For Partners / request | Partner description and request form | Yes | US-08, US-18, US-19, US-20, US-25, US-28 |
+| `/for-partners/` | For Partners | Invitation-only portal explanation and secure sign-in handoff | Yes | US-08, US-18, US-19, US-20, US-25 |
 | `/privacy/` | Privacy notice | Approved policy content | Yes | US-08, US-18, US-19 |
 | `/.well-known/security.txt` | Security contact | Security configuration | Not a page | US-27 |
 | `/404.html` | Not found | Static template | No | Reliability/accessibility |
@@ -47,7 +47,6 @@ Episode detail pages are children of Watch and appear through episode cards, pre
 - `StreamPlayer`: responsive 16:9 container, title, no autoplay, captions available, loading and failure states.
 - `CallToAction`: semantic link, not click-only container; external destinations disclosed.
 - `Notice`: plain-language context or constraint, announced only when dynamically updated.
-- `RequestForm`: labels, descriptions, validation summary, status region, privacy notice, Turnstile.
 - `SiteFooter`: required disclaimer and globally available links.
 - `SeoHead`: validates canonical title/description/image and generates social tags.
 - `AnalyticsEventLink`: progressive enhancement; navigation works if event delivery fails.
@@ -166,37 +165,37 @@ All components default to static HTML and CSS. Client scripts cannot contain sec
 
 ## For Partners (`/for-partners/`)
 
-**PURPOSE.** Explain the intended professional audience and collect the minimum request fields without granting access.
+**PURPOSE.** Explain that the partner portal is limited to people Brian has vetted privately and provide a neutral sign-in path for already-approved partners.
 
-**PRIMARY USER.** Podcaster, moderator, organizer, journalist, clinician, collaborator, or prospective donor.
+**PRIMARY USER.** A privately vetted and approved Correlius partner.
 
-**CONTENT.** Intended uses; manual-review statement; Name, Email, Organization/forum/podcast/affiliation, Type of collaboration, Short message; concise privacy notice and link; expected response framing without promising approval.
+**CONTENT.** Invitation-only statement; secure-portal explanation; exact-email approval boundary; explicit statement that visiting or attempting sign-in does not request access, create an account, or change the approved list.
 
-**COMPONENTS.** Audience/use summary, request form, Turnstile, validation summary, status region. Do not link to protected resource paths.
+**COMPONENTS.** Page intro, private-access explanation, and one `Partner sign-in` link to the protected portal root. Do not link to protected resource paths.
 
-**CALLS TO ACTION.** Submit request; return to Watch/About. An already-approved partner may navigate directly to the partner hostname only through a neutral “Partner sign-in” link that reveals no resources.
+**CALLS TO ACTION.** Partner sign-in. No application, registration, contact, or request action appears.
 
-**DATA/CONTENT SOURCE.** Static partner-purpose content and collaboration-type enum. POST goes to the Worker; form data is emailed only to Brian's verified destination, not written to the content repository. The applicant receives the server-rendered success receipt rather than a paid transactional email.
+**DATA/CONTENT SOURCE.** Static public copy only. Vetting records and approved-email administration remain outside the public repository.
 
-**ACCESSIBILITY.** Persistent labels, optional/required text, autocomplete attributes, field-level errors plus top summary, error focus management, no time limit, Turnstile accessible modes, success confirmation in a polite live region and as a server-rendered response.
+**ACCESSIBILITY.** Descriptive heading and link text, visible focus, sufficient contrast, and no authentication details embedded in the public page.
 
-**SEO METADATA.** Unique title/description/canonical and appropriate public share image. Metadata describes requesting access, not the contents of the private room.
+**SEO METADATA.** Unique title/description/canonical and appropriate public share image. Metadata describes sign-in for vetted partners, not the contents of the private room.
 
-**ERROR STATES.** Invalid input identifies fields without clearing valid values; spam/rate-limit response is generic and retryable; duplicate response says a recent request is already pending; provider failure does not claim submission succeeded; non-JavaScript POST returns an accessible HTML result.
+**ERROR STATES.** The retired `/api/partner-access` route returns HTTP 410 and accepts no data. Portal authentication and denial are owned by Cloudflare Access and remain enumeration-neutral.
 
 **RELEVANT USER STORIES.** US-08, US-18, US-19, US-20, US-25, US-28.
 
 ## Privacy (`/privacy/`)
 
-**PURPOSE.** State what the request form and aggregate analytics process, why, approximate retention, service providers, and contact path.
+**PURPOSE.** State that Correlius accepts no public partner applications, explain the separate protected-portal authentication boundary, and describe aggregate operational processing.
 
-**PRIMARY USER.** Applicant or privacy-conscious visitor.
+**PRIMARY USER.** Approved partner or privacy-conscious visitor.
 
-**CONTENT.** Minimum form fields, email delivery to Brian, on-page applicant receipt, 24-hour keyed duplicate marker, Cloudflare processing, aggregate analytics separation, no sale/advertising trackers, and request/contact process. Final policy requires owner review and is not legal advice.
+**CONTENT.** No-application statement, Cloudflare Access processing for approved partners, aggregate analytics separation, no sale/advertising trackers, and privacy contact process. Final policy requires owner review and is not legal advice.
 
 **COMPONENTS.** Plain prose with updated/effective date and contact link.
 
-**CALLS TO ACTION.** Return to request form; contact privacy address.
+**CALLS TO ACTION.** Return to the vetted-partner sign-in explanation; contact privacy address.
 
 **DATA/CONTENT SOURCE.** Approved privacy policy content synchronized with actual implementation.
 
@@ -238,12 +237,12 @@ Each template receives automated HTML, axe, and link tests plus manual keyboard,
 
 ## Global error/fallback principles
 
-Errors use plain language, preserve entered non-sensitive values when safe, move focus to an error summary only after submission, and never reveal secrets, stack traces, policy membership, or participant data. Static 404/500 states retain navigation and a Home/Watch recovery path. Analytics, social metadata, or image failures never block core reading, playback controls, form validation, or navigation.
+Errors use plain language and never reveal secrets, stack traces, policy membership, or participant data. Static 404/500 states retain navigation and a Home/Watch recovery path. Analytics, social metadata, or image failures never block core reading, playback controls, or navigation.
 
 ## Architectural decisions and open questions
 
 - **Decision:** route structure above is stable for four or more episodes; a new episode creates one detail page and one derived card.
 - **Decision:** Watch remains a catalog rather than embedding every full player, reducing load and cognitive clutter.
-- **Decision:** the public For Partners page contains the request form; the authenticated portal is a different hostname and build.
+- **Decision:** the public For Partners page has no application flow and links only to the authenticated portal root on a different hostname and build.
 - **Open:** supply the two completed episode records, share images, creator photo/alt text, approved medical/legal language, credit requirements, and Fractured Atlas link.
 - **Open:** decide whether genuine coming-soon episodes should be indexable; default is `noindex` until substantive approved content exists.

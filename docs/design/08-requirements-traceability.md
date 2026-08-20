@@ -19,7 +19,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 | US-05 | Browse multiple episodes | 03, 05 | Watch; Episode schema/state | Episode collection, derived routes/cards | WP-03, WP-04 | Fixture with 4+ ordered episodes; coming-soon/nonplayable checks; add N+1 test | DESIGN COMPLETE |
 | US-06 | Captions/accessibility | 03, 05 | Accessibility verification; Captions | Semantic templates, Stream captions, responsive CSS | WP-04, WP-05 | Manual keyboard/zoom/screen-reader/contrast and caption timing; browser/device matrix | DESIGN COMPLETE |
 | US-07 | Support via fiscal sponsor | 03 | Support | Validated external Fractured Atlas CTA | WP-06 | Link check; external-transition/fiscal-sponsor/rights wording review; no payment fields | DESIGN COMPLETE |
-| US-08 | Request partner access | 02, 03, 06 | Request flow; For Partners; request security | Worker, Turnstile, rate limit, KV digest, Email Service | WP-07 | Field/privacy/manual-review tests; Brian notification and applicant on-page receipt; spam/rate/duplicate cases; no Access API | DESIGN COMPLETE |
+| US-08 | Vetted-only partner entry | 03, 04, 06, 12 | For Partners; authentication entry; closed application surface | Static portal handoff, HTTP 410 retired endpoint, Access exact-email policy | WP-07, WP-08 | No-form/script/binding scan; GET/POST 410; secure-root link; privately approved email test | DESIGN COMPLETE |
 | US-09 | Approved partner OTP access | 04, 06 | Authentication entry; Authentication/authorization; PIN constraint | Access exact-email policy, OTP, sessions, logs | WP-08, WP-12 | Approved/unapproved/direct-file/session/revocation tests; provider evidence for per-email PIN rate limit | NO-GO AS WRITTEN |
 | US-10 | Audience evidence | 04, 05 | Audience Evidence; evidence structure/workflow | Protected content, accessible charts/tables, PDF | WP-09 | `n=11`, subgroup/count/percentage/limitations/critical/quote trace checks; identifier scan; protected download test | DESIGN COMPLETE |
 | US-11 | Feature-worthy case | 04 | Overview; Feature Correlius | Protected editorial/topic/format content | WP-09 | Decision-maker review; small-panel claim audit; Contact action test | DESIGN COMPLETE |
@@ -29,17 +29,17 @@ Work-package IDs refer to `09-implementation-plan.md`.
 | US-15 | Manage collaborator access | 04, 07 | Sessions/revocation; approval/revocation runbooks | Access policy/logs, protected host | WP-08, WP-13 | Add/remove without code/deploy; deny-default; logs and direct URL/sitemap tests | DESIGN COMPLETE |
 | US-16 | Low-maintenance content | 05, 07 | Content gates; Git/deployment pipeline | GitHub, schemas, Pages atomic builds/rollback | WP-01, WP-13 | Routine content change, induced failed build, rollback exercise; no DB/CMS/auth code change | DESIGN COMPLETE |
 | US-17 | Honest legal posture | 03, 06 | Footer/disclaimer; Legal/IP document | Global footer, approved public/partner summaries | WP-06, WP-14 | Every-page footer crawl; rights/credit review; no memo; cross-surface consistency | DESIGN COMPLETE |
-| US-18 | Protect participant/partner data | 01, 04, 06 | Classification; boundary; privacy separation | Separate repos/projects, Access, log redaction, private storage | WP-07–WP-10, WP-12 | Git/history/build/output scans; direct-file denial; raw/identifier/secret absence; noindex header | DESIGN COMPLETE |
-| US-19 | Privacy-conscious measurement | 02 | Analytics architecture | Edge HTTP Traffic Analytics, Stream Analytics, Analytics Engine, Access logs | WP-11 | Metric dictionary/event tests; hostname separation; payload/privacy audit; no browser beacon or survey join | DESIGN COMPLETE |
+| US-18 | Protect participant/partner data | 01, 04, 06 | Classification; boundary; privacy separation | Separate repos/projects, Access, private vetting records, private storage | WP-07–WP-10, WP-12 | Git/history/build/output scans; direct-file denial; raw/identifier/secret absence; no public application data; noindex header | DESIGN COMPLETE |
+| US-19 | Privacy-conscious measurement | 02 | Analytics architecture | Edge HTTP Traffic Analytics, Stream Analytics, Access logs | WP-11 | Hostname separation; payload/privacy audit; no application analytics, browser beacon, or survey join | DESIGN COMPLETE |
 | US-20 | Search/social discovery | 03 | SEO/social rules | Static metadata, canonical, sitemap, robots | WP-06 | Metadata crawler; social preview tools; public-only sitemap; partner noindex/absence | DESIGN COMPLETE |
 | US-21 | Legal/IP inquiry response | 06, 07 | Legal/IP response; removal/recovery | Private operational document, Stream/Pages controls | WP-14 | Private plan existence/review/tabletop; authority/contact and cross-copy checks | DESIGN COMPLETE |
 | US-22 | Fast, reliable site | 03, 07 | Responsive/performance; monitoring/failures | Static Pages/CDN, optimized assets, free incident/deploy alerts, GitHub smoke check | WP-02, WP-04, WP-13 | Performance/cache/deploy tests; free smoke-check alert; requirement amendment | NO-GO AS WRITTEN |
-| US-23 | Secure transport/browser | 06 | HTTPS/TLS; headers | Cloudflare TLS/HSTS, CSP, headers | WP-12 | HTTP redirect/header/CSP tests; SSL Labs; Stream/Turnstile CSP regression; SRI inventory | DESIGN COMPLETE |
+| US-23 | Secure transport/browser | 06 | HTTPS/TLS; headers | Cloudflare TLS/HSTS, CSP, headers | WP-12 | HTTP redirect/header/CSP tests; SSL Labs; Stream CSP regression; SRI inventory | DESIGN COMPLETE |
 | US-24 | Protect admin/partner accounts | 06, 07 | Supply chain; Access sessions; Git strategy | 2FA, GitHub Pro branch rules, scoped integration/tokens, revocation, 24h Access logs | WP-01, WP-08, WP-12 | Configuration screenshots/checklist; direct-push denial; token-scope/revoke/log test; accept 24h retention | OPEN QUESTION |
-| US-25 | Resist bots/DoS | 06 | WAF/bots; request security; PIN constraint | Free CDN/WAF/Bot Fight, Turnstile, form limits, Access provider controls | WP-07, WP-12 | Form load/spam/rate tests; cached spike/protected scrape test; provider PIN evidence | NO-GO AS WRITTEN |
+| US-25 | Resist bots/DoS | 06 | WAF/bots; closed application surface; PIN constraint | Free CDN/WAF/Bot Fight, HTTP 410 endpoint, Access provider controls | WP-07, WP-12 | Closed-endpoint tests; cached spike/protected scrape test; provider PIN evidence | NO-GO AS WRITTEN |
 | US-26 | Supply-chain security | 06, 07 | GitHub/supply chain; build | Dependabot, lockfile, scoped/pinned CI, atomic Pages | WP-01, WP-12, WP-13 | Dependency/secret/workflow permission checks; induced build failure; self-review record | DESIGN COMPLETE |
 | US-27 | Security reporting | 06 | `security.txt` | Static well-known file, monitored email/reminder | WP-12 | RFC 9116 validator; delivery/triage exercise; expiry check; no bounty language | DESIGN COMPLETE |
-| US-28 | Domain/email spoofing protection | 06, 07 | Account/domain security; DNS | Registrar, Cloudflare DNS/DNSSEC, Email Service, SPF/DKIM/DMARC | WP-07, WP-12 | DNSSEC/lock/renewal evidence; message header/alignment and spoof-policy tests | DESIGN COMPLETE |
+| US-28 | Domain/email spoofing protection | 06, 07 | Account/domain security; DNS | Registrar, Cloudflare DNS/DNSSEC, monitored domain mail | WP-12 | DNSSEC/lock/renewal evidence; mail authentication and spoof-policy tests | DESIGN COMPLETE |
 
 ## Definition of MVP Success traceability
 
@@ -47,7 +47,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 |---:|---|---|---|---|---|
 | 1 | Understand and begin watching within two minutes | Film-led Home, stable Watch/detail routes, performance budget | WP-02–WP-04 | Timed first-time mobile usability test | DESIGN COMPLETE |
 | 2 | Both completed episodes public without account | Released episode schema + anonymous Stream embed | WP-04 | Incognito playback of both episodes; no Access redirect | DESIGN COMPLETE |
-| 3 | Collaborator can request access | Public minimum-data form and manual-review flow | WP-07 | Submission emails Brian, returns applicant receipt, and grants no access | DESIGN COMPLETE |
+| 3 | Only privately vetted partners can proceed to sign-in | Public invitation-only handoff and closed application surface | WP-07, WP-08 | No form or processing bindings; retired endpoint returns 410; approved/unapproved Access test | DESIGN COMPLETE |
 | 4 | Approved collaborator authenticates by email | Access exact-email OTP | WP-08 | Approved/unapproved OTP test and log evidence | DESIGN COMPLETE, but US-09 PIN-rate subcriterion is NO-GO |
 | 5 | Evaluate evidence without identifiers | Protected de-identified evidence content/report | WP-09 | Research/privacy/content checklist and unauthenticated denial | DESIGN COMPLETE |
 | 6 | Host can download enough material | Protected media manifest, individual assets and package | WP-10 | Completeness/rights/a11y/download exercise | DESIGN COMPLETE |
@@ -70,7 +70,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 | Comprehensive lore encyclopedia | About and episode content remain MVP-scoped | Content/route audit |
 | Custom donation processing | All contribution actions leave for Fractured Atlas; no card fields/callback | Form/network/dependency audit |
 | Personalized donor dashboards | Donor Brief is common protected static content | Route/auth-role audit |
-| Automated CRM integration | Form sends email only; no CRM connector/data sync | Worker binding/dependency audit |
+| Automated CRM integration | No application form, request data, CRM connector, or data sync | Route/binding/dependency audit |
 | Multiple collaborator permission tiers | One exact-email Allow policy grants one portal tier | Access policy review |
 | Live streaming | Only on-demand released Stream assets are modeled | Stream/content configuration audit |
 | Native mobile applications | Responsive website only | Repository/project inventory |
@@ -85,7 +85,7 @@ Work-package IDs refer to `09-implementation-plan.md`.
 
 | Capability | Cost classification | Decision |
 |---|---|---|
-| Pages/static delivery, Workers/Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine | Free within published quotas | Include; keep browser analytics/NEL disabled; alert/review before any quota or pricing change |
+| Pages/static delivery, Access, edge HTTP Traffic Analytics, plan-appropriate security controls | Free within published quotas | Include; keep browser analytics/NEL disabled; alert/review before any quota or pricing change |
 | Cloudflare Access | Free below 50 active users; Access logs retained 24 hours | Include with 50-user cap; US-24 retention remains an owner decision |
 | Cloudflare Stream | Near-free usage pricing: $5 per 1,000 stored minutes and $1 per 1,000 delivered minutes | Include because explicitly required; no autoplay/preload and billing alerts |
 | GitHub Pro for private-repository branch protection | Approximately $4/month | Include only if Brian confirms this is near-free; otherwise US-24 is no-go |

@@ -23,23 +23,38 @@ for (const relativePath of forbiddenPublicPaths) {
   }
 }
 
-const requestSources = await Promise.all(
-  ["functions/api/partner-access.js", "src/server/partner-request.mjs"].map((relativePath) =>
-    readFile(`${repositoryRoot}/${relativePath}`, "utf8"),
-  ),
+const closedEndpoint = await readFile(
+  `${repositoryRoot}/functions/api/partner-access.js`,
+  "utf8",
 );
-const requestSource = requestSources.join("\n");
 
 for (const [label, pattern] of [
   ["Cloudflare Access API endpoint", /api\.cloudflare\.com[^\n]*access/iu],
   ["Access administration token binding", /\bACCESS_(?:API_)?TOKEN\b/u],
   ["Access policy mutation", /\/access\/(?:apps|organizations|policies)/iu],
 ]) {
-  assert.doesNotMatch(requestSource, pattern, `${label} must not enter the request worker`);
+  assert.doesNotMatch(closedEndpoint, pattern, `${label} must not enter the closed endpoint`);
 }
 
+for (const pattern of [
+  /Turnstile/iu,
+  /REQUEST_(?:MARKERS|RATE_LIMITER|RECIPIENT|SENDER)/u,
+  /EMAIL\.send/u,
+  /partner-request-contract/u,
+]) {
+  assert.doesNotMatch(closedEndpoint, pattern, "Closed endpoint retained application processing");
+}
+assert.match(closedEndpoint, /status:\s*410/u);
+
 const siteConfiguration = await readFile(`${repositoryRoot}/src/config/site.ts`, "utf8");
-assert.match(siteConfiguration, /partnerRequestEnabled:\s*false/u);
-assert.match(siteConfiguration, /turnstileSiteKey:\s*null/u);
+assert.doesNotMatch(siteConfiguration, /partnerRequestEnabled|turnstileSiteKey/u);
+
+const publicPartnerPage = await readFile(
+  `${repositoryRoot}/src/pages/for-partners/index.astro`,
+  "utf8",
+);
+assert.match(publicPartnerPage, /https:\/\/partners\.correlius\.org\//u);
+assert.match(publicPartnerPage, /does not accept partner applications online/iu);
+assert.doesNotMatch(publicPartnerPage, /<form\b|PartnerRequestForm|Turnstile/iu);
 
 console.log("Public/private partner boundary verification passed.");

@@ -126,11 +126,11 @@ export async function smokePublic({ baseUrl, episodeUrl = null, fetchImplementat
 
   const requestEndpoint = new URL("/api/partner-access", base);
   const endpointResponse = await request(fetchImplementation, requestEndpoint);
-  if (endpointResponse.status !== 405 || endpointResponse.headers.get("Allow") !== "POST") {
-    throw new Error("Partner request endpoint did not reject GET with Allow: POST.");
+  if (endpointResponse.status !== 410) {
+    throw new Error("Closed partner application endpoint did not return HTTP 410.");
   }
   if (!endpointResponse.headers.get("Cache-Control")?.includes("no-store")) {
-    throw new Error("Partner request endpoint response is cacheable.");
+    throw new Error("Retired partner endpoint response is cacheable.");
   }
 
   let player = null;
@@ -194,8 +194,7 @@ async function selfTest() {
       });
     }
     if (url.pathname === "/api/partner-access") {
-      const result = response({ url: url.href, status: 405, body: "method not allowed" });
-      result.headers.set("Allow", "POST");
+      const result = response({ url: url.href, status: 410, body: "applications closed" });
       result.headers.set("Cache-Control", "private, no-store");
       return result;
     }

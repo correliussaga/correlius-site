@@ -66,7 +66,7 @@ flowchart LR
   ACC --> PAR[partners.correlius.org]
 
   PUB --> ST[Cloudflare Stream]
-  PUB --> WK[Request/event Workers]
+  PUB -. retired application endpoint returns 410 .-> CLOSED[Closed endpoint]
   CF[Cloudflare DNS/TLS/WAF/analytics/alerts] --> PUB
   CF --> ACC
   BA[Brian dashboard operations] --> ST
@@ -86,8 +86,6 @@ flowchart LR
 
 ### Provider-managed, sensitive
 
-- Turnstile secret and KV HMAC pepper in Worker secret bindings;
-- Email/Analytics/KV service bindings;
 - any least-privilege deployment token in GitHub environment secrets (prefer native Pages integration without a token);
 - Access allowlist/policies and authentication logs;
 - Cloudflare account/API credentials and registrar/email recovery data.
@@ -112,8 +110,8 @@ Stream assets are uploaded through Brian's 2FA-protected dashboard. Per released
 - One self-hosted application/policy boundary covers the partner custom host.
 - Pages production and preview hostnames receive Access policies as documented by Cloudflare Pages.
 - Exact-email Allow entries only; OTP identity provider; 8-hour session; deny by default.
-- Application name/help text avoids email enumeration and links to the public request process.
-- Brian approves/revokes through Cloudflare configuration, never code or the form Worker.
+- Application name/help text avoids email enumeration and states that access requires prior private approval without linking to an application process.
+- Brian vets partners privately and approves/revokes exact emails through Cloudflare configuration, never public-site code.
 - Access configuration is recorded in a secret-free checklist/export description; policy data containing partner email remains restricted.
 
 ## Deployment pipeline and failure behavior
@@ -137,7 +135,7 @@ No third-party APM/error tracker is added. The existing mandated GitHub platform
 
 ## Cost controls
 
-- Cloudflare Pages, Functions/Workers, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine, WAF/Bot controls, and Access stay on Free tiers. Client-side Web Analytics and Network Error Logging remain disabled.
+- Cloudflare Pages, Access, edge HTTP Traffic Analytics, and plan-appropriate WAF/Bot controls stay on Free tiers. Client-side Web Analytics and Network Error Logging remain disabled.
 - Access is capped below 50 active partner users. No paid seat or log-retention plan is enabled.
 - GitHub Pro (approximately $4/month) is the fixed near-free cost required for protected branches on the private partner repository.
 - Stream is usage-based: $5 buys 1,000 stored minutes and delivery is $1 per 1,000 minutes. Disable autoplay/preload, enable billing alerts, and review usage monthly.
@@ -186,10 +184,10 @@ No third-party APM/error tracker is added. The existing mandated GitHub platform
 
 ## Partner approval runbook
 
-1. Review the request notification manually; verify context through a trusted reply/channel as warranted. Form submission alone is not approval.
+1. Complete private vetting through a trusted channel and record the approval rationale outside public Git.
 2. In Cloudflare Zero Trust, add the exact normalized email to the partner Access Allow policy. Do not create a broad domain rule.
 3. Use policy testing/configuration review to confirm the address matches and unrelated test address does not.
-4. Notify the applicant through the approved mailbox with the partner URL and OTP expectations; do not send a password.
+4. Notify the approved partner privately with the partner URL and OTP expectations; do not send a password.
 5. Confirm successful authentication in Access logs after their first use. Record approval rationale/date in private operational notes if Brian chooses; never in public Git.
 
 ## Partner revocation runbook

@@ -78,11 +78,14 @@ for (const page of htmlPages) {
   ]) {
     if (!content.includes(metadata)) throw new Error(`${page}: social metadata incomplete`);
   }
-  if (!content.includes("Draft notice—final wording requires approval.")) {
-    throw new Error(`${page}: draft legal notice missing`);
+  if (!content.includes("Correlius is an unofficial, noncommercial fan project.")) {
+    throw new Error(`${page}: fan-project legal notice missing`);
   }
   if (content.includes('href="#"')) throw new Error(`${page}: placeholder link detected`);
-  if (content.includes("partners.correlius.org")) {
+  if (
+    !["for-partners/index.html", "privacy/index.html"].includes(page) &&
+    content.includes("partners.correlius.org")
+  ) {
     throw new Error(`${page}: protected hostname leaked into public shell`);
   }
 
@@ -143,7 +146,6 @@ for (const requiredFile of [
   ".well-known/security.txt",
   "robots.txt",
   "scripts/navigation.js",
-  "scripts/partner-request.js",
   "scripts/stream-player.js",
 ]) {
   await access(join(buildRoot, requiredFile));
@@ -156,8 +158,11 @@ if (!responseHeaders.includes("Content-Security-Policy:")) {
 if (responseHeaders.includes("Content-Security-Policy-Report-Only:")) {
   throw new Error("_headers: Content-Security-Policy remains report-only");
 }
-if (!responseHeaders.includes("frame-src https://challenges.cloudflare.com https://*.cloudflarestream.com")) {
-  throw new Error("_headers: click-to-load providers are missing from frame-src");
+if (!responseHeaders.includes("frame-src https://*.cloudflarestream.com")) {
+  throw new Error("_headers: Cloudflare Stream is missing from frame-src");
+}
+if (responseHeaders.includes("challenges.cloudflare.com")) {
+  throw new Error("_headers: removed Turnstile origin remains in the CSP");
 }
 
 const securityText = await readFile(join(buildRoot, ".well-known/security.txt"), "utf8");
@@ -189,26 +194,14 @@ for (const page of htmlPages) {
 }
 
 const partnerPage = await readFile(join(buildRoot, "for-partners/index.html"), "utf8");
-if (!partnerPage.includes('<form class="request-form" action="/api/partner-access" method="post">')) {
-  throw new Error("for-partners/index.html: request contract form missing");
+if (!partnerPage.includes('href="https://partners.correlius.org/"')) {
+  throw new Error("for-partners/index.html: secure partner portal link missing");
 }
-if (!/<fieldset disabled>/u.test(partnerPage)) {
-  throw new Error("for-partners/index.html: unconfigured request form is not disabled");
+if (!partnerPage.includes("does not accept partner applications online")) {
+  throw new Error("for-partners/index.html: vetted-only access statement missing");
 }
-if (partnerPage.includes("challenges.cloudflare.com/turnstile/v0/api.js")) {
-  throw new Error("for-partners/index.html: Turnstile loaded while request form is disabled");
-}
-
-const partnerScript = await readFile(join(buildRoot, "scripts/partner-request.js"), "utf8");
-for (const setting of [
-  '"https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"',
-  'execution: "execute"',
-  'appearance: "interaction-only"',
-  '"response-field-name": "cf-turnstile-response"',
-]) {
-  if (!partnerScript.includes(setting)) {
-    throw new Error(`scripts/partner-request.js: missing privacy-preserving setting ${setting}`);
-  }
+if (/<form\b|Turnstile|request-form/iu.test(partnerPage)) {
+  throw new Error("for-partners/index.html: online application surface detected");
 }
 
 const streamScript = await readFile(join(buildRoot, "scripts/stream-player.js"), "utf8");

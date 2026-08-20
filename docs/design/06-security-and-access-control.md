@@ -4,7 +4,7 @@
 
 1. Public films remain anonymously available while common browser/web threats are reduced.
 2. No unauthenticated request can retrieve partner HTML or files, including via direct or alternate URLs.
-3. Applicant, partner, participant, donor, legal, and credential information is not exposed through public source, builds, analytics, or logs.
+3. Partner, participant, donor, legal, and credential information is not exposed through public source, builds, analytics, or logs.
 4. Compromise of one deployment credential or contributor change is constrained by least privilege, 2FA, review, and atomic deployment.
 5. Controls are concrete and testable at MVP scale; no Enterprise-only or undocumented protection is claimed.
 
@@ -17,7 +17,6 @@ This is a lightweight threat model, not a penetration test or legal/privacy opin
 | Public pages/films | Public; integrity/availability matter | TLS, origin restrictions, deploy integrity, CDN/alerts |
 | Partner pages/downloads | Partner-confidential | Access before origin, no alternate public URL, controlled repository |
 | Approved-email allowlist | Operational-sensitive | Cloudflare configuration only, least privilege, no client/repo copy |
-| Applicant submissions | Operational-sensitive personal data | Minimize, validate, email only, redact logs, no Git storage |
 | Authentication/audit logs | Operational-sensitive | Restricted administrators, defined review/retention |
 | Aggregate audience report | Partner-confidential | De-identification and Access |
 | Raw research/identity map | Restricted | Separate private storage; never deployed |
@@ -28,7 +27,7 @@ This is a lightweight threat model, not a penetration test or legal/privacy opin
 
 ## Actors
 
-- Legitimate anonymous viewer or applicant.
+- Legitimate anonymous viewer or privately vetted partner.
 - Approved partner on a trusted or lost/compromised device.
 - Brian/authorized administrator.
 - Opportunistic bot, spammer, scraper, credential/PIN guesser.
@@ -43,10 +42,9 @@ This is a lightweight threat model, not a penetration test or legal/privacy opin
 2. Cloudflare Access authorization decision to partner Pages origin.
 3. Public repository/build to private partner repository/build.
 4. GitHub workflow/build dependencies to production artifact.
-5. Worker to Turnstile, KV, Email Service, and Analytics Engine bindings.
-6. Public page/player to Cloudflare Stream.
-7. Website to external Fractured Atlas and email systems.
-8. Deployed content to restricted research/legal/master storage.
+5. Public page/player to Cloudflare Stream.
+6. Website to external Fractured Atlas and email systems.
+7. Deployed content to restricted research/legal/master storage.
 
 The system-context and logical diagrams in documents 01 and 02 visualize these boundaries.
 
@@ -102,11 +100,11 @@ Start with a report-only CSP in preview, eliminate violations, then enforce in p
 - `object-src 'none'`
 - `frame-ancestors 'none'` (or equivalent X-Frame-Options `DENY` as legacy defense)
 - `form-action 'self'`
-- narrowly enumerated `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-src`, and `media-src` for Cloudflare Stream, Turnstile, and first-party endpoints only
+- narrowly enumerated `script-src`, `style-src`, `img-src`, `font-src`, `connect-src`, `frame-src`, and `media-src` for Cloudflare Stream and first-party endpoints only
 - no `'unsafe-eval'`; avoid `'unsafe-inline'` through hashes/nonces or static external scripts
 - `upgrade-insecure-requests` after preview validation
 
-Also set `X-Content-Type-Options: nosniff`, strict `Referrer-Policy` (recommended `strict-origin-when-cross-origin`), conservative `Permissions-Policy`, and secure cache policies. Partner responses also send `X-Robots-Tag: noindex, nofollow, noarchive`. The CSP must be tested against actual Stream and Turnstile origins; do not copy a placeholder policy into production.
+Also set `X-Content-Type-Options: nosniff`, strict `Referrer-Policy` (recommended `strict-origin-when-cross-origin`), conservative `Permissions-Policy`, and secure cache policies. Partner responses also send `X-Robots-Tag: noindex, nofollow, noarchive`. The CSP must be tested against actual Stream origins; do not copy a placeholder policy into production.
 
 Third-party CDN scripts are avoided. If one is unavoidable and the provider publishes stable versioned bytes, pin the version and use SRI plus `crossorigin`; SRI is not used for scripts whose provider intentionally changes content at the same URL.
 
@@ -114,8 +112,7 @@ Third-party CDN scripts are avoided. If one is unavoidable and the provider publ
 
 - Enable Cloudflare's available managed WAF rules for the selected plan on both hostnames.
 - Enable Bot Fight Mode or the plan-equivalent bot control; do not claim Enterprise Bot Management.
-- Apply the available zone rate-limit rule to `POST /api/partner-access`, tracked by IP at a conservative threshold and returning a generic 429. Also enforce a Worker-side per-IP/binding rate limit if available, request-size limit, and one valid submission per email digest/24 hours.
-- Validate Turnstile server-side; tokens are single-use and expire.
+- Keep the retired `/api/partner-access` route binding-free, non-cacheable, and fixed at HTTP 410 for every method.
 - Do not aggressively challenge ordinary cached `GET` traffic or verified search bots on public pages; static CDN delivery absorbs viral reads.
 - Public scraping yields only public content. The partner origin remains behind Access regardless of path knowledge.
 - Cloudflare's platform DDoS/CDN protection and static cache provide graceful scale; no availability guarantee beyond provider capability is claimed.
@@ -130,33 +127,16 @@ Therefore this criterion is **NO-GO AS WRITTEN / not exactly verifiable with the
 2. obtain written Cloudflare confirmation/plan capability; or
 3. introduce a custom/third-party identity flow, which expands scope and security risk and is not recommended.
 
-## Partner request security and privacy
+## Vetted-only partner boundary
 
-The public request endpoint:
+The public site does not accept partner applications or prospective-partner contact data. It contains no application form, Turnstile integration, request contract, request email, KV marker, or automated approval path. Brian vets partners privately and separately administers exact approved email addresses in Cloudflare Access.
 
-- accepts POST only from the canonical site with same-origin checks/CSRF-conscious design;
-- permits only the five required fields and Turnstile token;
-- validates type, Unicode normalization, maximum byte/character lengths, collaboration enum, and email shape without pretending to prove address ownership;
-- HTML-escapes any response and generates notification email as safely encoded plain text (HTML alternative optional but escaped);
-- verifies Turnstile server-side with secret binding;
-- rate-limits by IP and rejects oversized/incorrect content types before parsing;
-- derives `HMAC-SHA-256(server_secret, normalized_email)` and checks/stores only that digest in KV with a 24-hour TTL;
-- never logs form bodies, email values, Turnstile token, or raw IP in application logs;
-- sends notification only to Brian's verified destination through authenticated domain email;
-- returns an accessible server-rendered confirmation receipt to the applicant only after the notification is accepted for delivery;
-- creates no Access account/allowlist rule;
-- records only an aggregate outcome enum in analytics.
-
-The duplicate response is neutral: a recent request is already pending and duplicate delivery was suppressed/flagged. KV eventual consistency leaves a narrow simultaneous-request race; exact serialization would require stronger state. The privacy notice discloses email processing and retention practices. Brian's mailbox retention/deletion process must be specified before launch because email becomes the operational record. Applicant email confirmation is intentionally omitted: Cloudflare permits free sending to verified destinations such as Brian, while arbitrary recipients require Workers Paid.
+The public For Partners page links only to the protected portal root. It does not expose protected resource paths or reveal allowlist membership. The retired `/api/partner-access` route returns HTTP 410 with non-cacheable headers for every method, does not read request bodies, and does not access provider bindings. Visiting the portal or attempting sign-in cannot create an application, account, or allowlist entry.
 
 ## Secrets management
 
 | Secret | Location | Scope/rotation |
 |---|---|---|
-| Turnstile secret | Worker/Pages secret binding | Form validation only; rotate on exposure |
-| KV HMAC pepper | Worker secret binding | Digest generation only; rotate with understanding old markers become unreadable |
-| Email binding/API credential | Prefer native binding; otherwise Worker secret | Send from approved domain only |
-| Analytics write binding | Worker binding | Named dataset only |
 | Cloudflare deployment token, if used | GitHub Actions environment secret | Pages project edit only; prefer native Git integration requiring no token |
 | Stream API credential | None in MVP CI | Dashboard publishing; if later added, narrowly scoped secret |
 
@@ -209,9 +189,9 @@ US-21 creates a private operational document, not site functionality. Store it i
 | T3 | Unapproved user enumerates allowlist | Access generic OTP response; no custom lookup; restricted logs | Approved users know their own status by receipt, inherently |
 | T4 | PIN brute force/abuse | Provider single-use/expiry/anti-abuse, logs, session controls | Exact per-email rate-limit cannot be customer-verified; no-go until requirement amendment/provider proof |
 | T5 | Lost approved device retains access | 8-hour session; remove email and revoke user tokens | Exposure until revocation/propagation; partner should report promptly |
-| T6 | Form spam/flood | Turnstile server validation, WAF/Worker rate limit, size limits, KV dedupe | Distributed low-rate abuse may pass; manual review remains |
-| T7 | Form injection/header injection | Strict fields/lengths, newline rejection in address fields, safe mail builder, escaping | Email rendering clients vary; test malicious fixtures |
-| T8 | Applicant data leaks through logs/analytics | Payload redaction, no body logging, aggregate enums only | Email provider/mailbox remains processor/storage |
+| T6 | Stale client submits to retired application endpoint | HTTP 410 for every method; no body parsing or provider bindings; `no-store` | Edge request metadata still exists as ordinary hosting/security data |
+| T7 | Public page implies or exposes an application path | Build scans reject forms, request scripts, Turnstile origins, and protected resource links | Copy drift requires review |
+| T8 | Private vetting or allowlist data enters public source | Separate administration boundary; repository/build secret and identifier scans | Owner operational handling remains outside this repository |
 | T9 | Public build contains partner/raw file | Separate repositories/projects, denylist scans, artifact manifest, human review | Historical Git exposure requires credential/data response if it occurs |
 | T10 | XSS or malicious dependency | Static rendering/escaping, CSP, minimal JS, lockfile, Dependabot, SRI where viable | Supply-chain risk cannot be eliminated |
 | T11 | Compromised deployment credential | 2FA, scoped token/App, protected branch, secret scanning, revocation runbook | Owner endpoint/email compromise remains material |
@@ -237,11 +217,11 @@ Cloudflare's free notifications are configured for Pages deployment failures, se
 
 ## Cost-security guardrail
 
-- Use Cloudflare Free tiers for Pages, Workers/Functions, KV, Turnstile, edge HTTP Traffic Analytics, Analytics Engine, WAF/Bot Fight features, and Access below 50 active users. Keep client-side Web Analytics and Network Error Logging disabled.
+- Use Cloudflare Free tiers for Pages, edge HTTP Traffic Analytics, plan-appropriate WAF controls, and Access below 50 active users. Keep client-side Web Analytics and Network Error Logging disabled.
 - Use GitHub Pro only because enforced branch protection on a private repository is required by US-24; at approximately $4/month it is the only fixed near-free security upgrade.
-- Do not enable Cloudflare Pro Health Checks, Workers Paid for applicant email, paid Access seats/retention, Enterprise Logpush, advanced Bot Management, or third-party APM.
+- Do not enable Cloudflare Pro Health Checks, paid Access seats/retention, Enterprise Logpush, advanced Bot Management, or third-party APM.
 - Cloudflare Stream remains usage-priced; disable autoplay/preload, configure billing alerts, and review usage monthly. No security feature may trigger a plan upgrade automatically.
-- If a quota is approached, fail/degrade the optional event/form capability safely and review scope before purchasing capacity.
+- If a quota is approached, fail/degrade optional aggregate measurement safely and review scope before purchasing capacity.
 
 ## Security launch checklist
 
@@ -258,12 +238,12 @@ Cloudflare's free notifications are configured for Pages deployment failures, se
 
 - [ ] All HTTP redirects to HTTPS; certificates and canonical hosts verified.
 - [ ] HSTS deployed safely; SSL Labs/equivalent scan passes agreed grade with no critical issue.
-- [ ] CSP enforced after report-only testing; Stream/Turnstile work; no unnecessary origins.
+- [ ] CSP enforced after report-only testing; Stream works; removed Turnstile origins are absent.
 - [ ] `nosniff`, frame restriction, Referrer-Policy, Permissions-Policy confirmed with automated header tests.
 - [ ] WAF managed rules and plan-appropriate bot protection enabled on both hosts.
-- [ ] Form rate limit and server-side Turnstile validation tested.
+- [ ] Retired application endpoint returns non-cacheable HTTP 410 for GET and POST without binding access.
 - [ ] DNSSEC validates; stale DNS removed; registrar transfer lock and auto-renew/alerts enabled.
-- [ ] SPF/DKIM/DMARC alignment verified for Brian's request-notification messages; applicant confirmation is on-page.
+- [ ] SPF/DKIM/DMARC alignment is verified for monitored domain mail; no application notification path exists.
 
 ### Partner access
 
