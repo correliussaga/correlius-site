@@ -12,7 +12,7 @@ This runbook records the approved external boundary for the future private partn
 
 ## Approve a partner
 
-1. Review the public request manually outside the request Worker. A request is context, not authorization.
+1. Review the privately sourced prospective relationship outside the website. Correlius accepts no public request, and private outreach or context is not authorization.
 2. Confirm the exact email and approval basis through the private owner process.
 3. Add only that exact email to the single Access Allow policy. Do not add a whole domain, an `Everyone` rule, or a request-driven automation.
 4. Test the generic OTP flow with the approved address and an unapproved control address. The visible response must not disclose allowlist membership.

@@ -56,5 +56,15 @@ const publicPartnerPage = await readFile(
 assert.match(publicPartnerPage, /https:\/\/partners\.correlius\.org\//u);
 assert.match(publicPartnerPage, /does not accept partner applications online/iu);
 assert.doesNotMatch(publicPartnerPage, /<form\b|PartnerRequestForm|Turnstile/iu);
+assert.doesNotMatch(
+  publicPartnerPage,
+  /\/(?:audience-evidence|contact|donor-brief|downloads|feature-correlius|films|media-kit)\//u,
+  "Public partner handoff must not enumerate protected portal routes or resources",
+);
+assert.doesNotMatch(
+  publicPartnerPage,
+  /\b(?:download|feedback form|register)\b/iu,
+  "Public partner handoff must remain a neutral sign-in boundary",
+);
 
 console.log("Public/private partner boundary verification passed.");
